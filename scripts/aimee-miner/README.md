@@ -1,6 +1,6 @@
 # AIMeE miner
 
-Automates an AIMeE mining cycle with unloading, charging, stuck recovery, weather recall, hangar control, and status displays. This copy is stored unchanged from the supplied script and is based on [Aimee V3.6](https://steamcommunity.com/sharedfiles/filedetails/?id=3781550064) by ᴵᴬᴳChurchill.
+Automates an AIMeE mining cycle with unloading, charging, stuck recovery, weather recall, hangar control, and status displays. The original supplied script is preserved in git commit `4e95b0a`; the working version is based on [Aimee V3.6](https://steamcommunity.com/sharedfiles/filedetails/?id=3781550064) by ᴵᴬᴳChurchill.
 
 ## Hardware
 
@@ -55,13 +55,13 @@ The batch operations affect every matching hangar door on the IC output network.
 ## Operating cycle
 
 1. Open all matching hangar doors and turn on the transmitter/AIMeE.
-2. Navigate through the waypoint to the unload position.
+2. On initial/full-cargo cycles, navigate through the waypoint to the unload position. After a recall, go directly to unload because Home and Unload are the same location.
 3. Select Mode 4 and wait until slot-0 charge is at least 70,000 and the AIMeE leaves Mode 4.
 4. Navigate through the waypoint to the mine position.
 5. If mineables are present, select Mode 3 and keep mining.
 6. When mining ends in Mode 6, restart the route and return to unload. If no mineables remain, recall home instead.
 7. A raised lever or dangerous weather recalls the AIMeE through the waypoint to Home, powers it down, and closes the hangar.
-8. Wait for weather Mode 0, lower the lever, then restart the complete cycle.
+8. Wait for weather Mode 0, lower the lever, then restart directly at unload. The next outbound waypoint is not entered until Mode 4 has completed.
 
 The script treats AIMeE modes as follows:
 
@@ -78,6 +78,8 @@ The script treats AIMeE modes as follows:
 
 `nav` places the caller's return address on the stack because it calls `update` itself. While Mode 2 is active, it counts consecutive updates where velocity is below `0.2`. After more than 20, it selects Mode 5, waits, sleeps for 10 seconds, returns to Mode 2, and resets the counter. Normal movement also resets the counter to zero.
 
+`recall` is a deliberate non-returning control-flow boundary. It resets `sp` before starting its own navigation calls so that a recall originating inside `nav` cannot leave an abandoned return address on the stack.
+
 ## Register map
 
 | Register | Use |
@@ -88,15 +90,23 @@ The script treats AIMeE modes as follows:
 | `r3` | Consecutive low-velocity counter |
 | `r4` | Navigation target X |
 | `r5` | Navigation target Z |
-| `r6` | Recall-in-progress flag |
+| `r6` | Recall-in-progress and restart-at-unload flag |
 | `r7` | Lever state |
 | `r8` | Weather mode |
 | `ra` | Subroutine return address; preserved by `nav` with `push`/`pop` |
 
-## Debugging observations
+## Debugging history and observations
 
-No code has been changed, but two details are important for the next debugging pass:
+Changes after the original import:
 
-- `update` loads `NextWeatherEventTime` into `r0`, then immediately runs `snan r0 r0`. This replaces the time with a Boolean NaN test (`0` or `1`) before comparing it with `STORMTIME` (600) and before displaying it on `db.Setting`.
-- The low-velocity counter `r3` is not explicitly reset when entering `nav`. It resets when velocity reaches `0.2` or after the Mode 5 recovery path.
+- Removed the `snan` immediately after the normal weather-time load. The raw countdown now reaches the `STORMTIME` comparison instead of being replaced by `0` or `1`.
+- A post-recall restart branches directly to the existing unload/charge block. AIMeE cannot enter the outbound waypoint until Mode 4 completes and charge reaches the configured threshold.
+- `recall` resets `sp` because it intentionally abandons any active caller instead of returning through it.
+- The housing displays the raw weather countdown while parked instead of converting it to a NaN flag.
 
+Known assumptions and edge behavior:
+
+- Exactly one connected Weather Station is required. The reads use batch mode `Sum`; zero stations looks like clear weather, while multiple stations sum their modes and times into values this state machine does not support.
+- Emptying is inferred from AIMeE leaving Mode 4; the script does not inspect all eight ore slots separately. It also keeps waiting until slot-0 charge reaches 70,000. This is the intended AIMeE mode contract, but the physical unload area still has to be functional.
+- A manual lever recall during clear weather closes the hangar, then lowers the lever and starts again on the next clear-state pass. It is a recall trigger, not a persistent off switch.
+- `r3` can carry a small low-velocity count from one navigation leg into the next. Normal movement immediately resets it; with the configured non-identical route legs this does not change behavior.

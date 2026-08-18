@@ -15,17 +15,18 @@ alias lever d5
 define WEATHER 1997212478
 define HANGARDOORHASH -566348148
 define STORMTIME 600
-setup:
 s dispC Color 5
 s dispC Mode 2
 move r6 0
 start:
 sb HANGARDOORHASH Open 1
-move r6 0
 s Transmitter On 1
+bnez r6 unload
 move r4 WaypointX
 move r5 WaypointZ
 jal nav
+unload:
+move r6 0
 move r4 UnloadX
 move r5 UnloadZ
 jal nav
@@ -80,7 +81,6 @@ move r3 0
 j wait
 update:
 lb r0 WEATHER NextWeatherEventTime Sum
-snan r0 r0
 s db Setting r0
 lb r8 WEATHER Mode Sum
 beq r6 1 skipSafe
@@ -106,6 +106,7 @@ ls r2 Transmitter 0 Charge
 s dispC Setting r2
 j ra
 recall:
+move sp 0
 move r6 1
 move r4 WaypointX
 move r5 WaypointZ
@@ -120,7 +121,6 @@ sb HANGARDOORHASH Open 0
 waitClear:
 yield
 lb r0 WEATHER NextWeatherEventTime Sum
-snan r0 r0
 s db Setting r0
 lb r8 WEATHER Mode Sum
 bnez r8 waitClear
