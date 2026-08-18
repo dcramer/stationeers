@@ -2,6 +2,9 @@
 
 Compact reference for the 154 instructions in Stationeers game data `0.2.6367.27532`.
 
+For state-machine, recovery, and line-budget patterns, see
+[IC10 script design](ic10-script-design.md).
+
 ## Notation
 
 - `dst` — destination register (`r0`–`r15`, an alias, or an indirect register where supported)
@@ -13,6 +16,49 @@ Compact reference for the 154 instructions in Stationeers game data `0.2.6367.27
 - `typeHash`, `nameHash`, `reagentHash` — number, register, or `HASH("...")`
 - Batch modes: `Average` (0), `Sum` (1), `Minimum` (2), `Maximum` (3)
 - Reagent modes: `Contents` (0), `Required` (1), `Recipe` (2)
+
+## Execution model
+
+- An IC10 program has a practical limit of 128 source lines. Every physical line has an address; comments, blank lines, labels, `alias`, and `define` lines still occupy addresses and consume the per-tick line budget.
+- Execution normally advances one line at a time. The chip executes at most 128 line operations per game tick, then pauses automatically.
+- `yield` ends the current run and resumes at the following line next tick. `sleep` resumes after the requested game-time duration.
+- A runtime error stops the current run at the failing line. The housing reports the error and execution retries that line on a later run until the underlying problem is removed.
+- Values are double-precision numbers. The ordinary working registers are `r0`–`r15`; `sp` and `ra` are writable special registers backed by `r16` and `r17`.
+- `d0`–`d5` are the housing's configured device pins. `db` refers to the device hosting the chip, normally the IC housing itself.
+
+### Calls, return addresses, and stack
+
+IC10 has no automatic call frames. `jal target` only writes the following line address into the single `ra` register and jumps. A subroutine returns with `j ra`.
+
+If a subroutine calls another subroutine, it must preserve its caller's address:
+
+```ic10
+outer:
+push ra
+jal inner
+pop ra
+j ra
+```
+
+The local stack has 512 values and `sp` points to the next free entry. `push` writes then increments `sp`; `pop` decrements then reads. Every path leaving a subroutine must balance its pushes and pops. A jump that abandons a pushed frame leaks a stack entry unless the program deliberately restores `sp`.
+
+Stack contents persist on the chip, while loading source resets `sp` to zero. Neither `sp` nor `ra` is protected from ordinary writes.
+
+### Device access and missing batch data
+
+- `l`/`s` use a configured device or device reference; an unsupported property raises a runtime error.
+- `ld`/`sd` address one device by `ReferenceId`.
+- Batch instructions select every matching device on the IC housing's output network by prefab hash, optionally filtered by name hash.
+- Batch aggregation does not use one universal missing-device value:
+
+| Batch mode | No matching devices |
+|---|---:|
+| `Average` | `nan` |
+| `Sum` | `0` |
+| `Minimum` | `0` |
+| `Maximum` | `ninf` |
+
+Consequently, `snan` can detect an empty `Average` batch but cannot detect an empty `Sum` batch. `snan dst value` also overwrites `dst` with the Boolean result; preserve `value` elsewhere if it is still needed.
 
 ## Utility and execution
 

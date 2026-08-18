@@ -10,6 +10,7 @@ An organized workspace for writing, documenting, and checking IC10 programs for
 ├── AGENTS.md                 # Guidance for coding agents and contributors
 ├── docs/
 │   ├── ic10-instructions.md # Local IC10 syntax reference
+│   ├── ic10-script-design.md # State-machine and recovery patterns
 │   └── prefab-hashes.md     # Versioned Stationpedia prefab hash catalog
 ├── scripts/
 │   ├── README.md            # Script layout and documentation template
@@ -30,6 +31,8 @@ References and conventions:
 
 - [IC10 instruction reference](docs/ic10-instructions.md) — compact local
   syntax and descriptions.
+- [IC10 script design](docs/ic10-script-design.md) — state machines, device
+  modes, recovery paths, stack discipline, and review checklist.
 - [Prefab hash catalog](docs/prefab-hashes.md) — every prefab name and signed
   hash in the pinned Stationpedia game-data version.
 - [Script conventions](scripts/README.md) — directory layout and README

@@ -8,6 +8,9 @@ game-ready, and easy to configure from an IC Housing.
 - Before editing or reviewing IC10, read `docs/ic10-instructions.md`. It is the
   repository's syntax and execution reference and identifies the game-data
   version from which it was derived.
+- Read `docs/ic10-script-design.md` when changing control flow, wait loops,
+  device modes, recovery, or safety behavior. Use its entry-path checklist
+  during review.
 - Verify device properties, slot properties, hashes, and current behavior in
   Stationpedia for the target game version. Syntax and lint success do not prove
   that a script works at runtime.
@@ -37,6 +40,9 @@ game-ready, and easy to configure from an IC Housing.
 - Treat registers, `ra`, `sp`, and the stack as shared state. For nested calls,
   preserve return addresses and balance every stack path. Document a register
   map when reuse is not obvious.
+- Distinguish returning subroutines from non-returning state transitions. Trace
+  cold start, normal completion, and interruptions from every wait loop; prove
+  the required postcondition before resuming an outbound or hazardous state.
 - Treat batch operations (`lb`, `lbn`, `sb`, and related instructions) as
   network-wide unless narrowed by a name hash. Check empty-batch behavior in
   the local reference.
@@ -52,6 +58,7 @@ Document, when applicable:
 - required hardware, network assumptions, and a `d0`-through-`d5` pin table;
 - constants, hashes, thresholds, and required device names;
 - startup, normal operation, shutdown, and fail-safe behavior;
+- asynchronous mode completion conditions and recovery postconditions;
 - known limitations and version assumptions;
 - a register map for non-obvious control flow or register reuse.
 
