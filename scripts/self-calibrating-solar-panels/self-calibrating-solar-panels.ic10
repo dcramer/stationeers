@@ -1,0 +1,128 @@
+alias sensor d0
+alias parkSwitch d1
+alias calibrationPanel d2
+define SIG 1980
+define RESET 0
+define SWITCH 321604921
+poke 3 -2045627372
+poke 4 -539224550
+poke 5 -934345724
+poke 6 -1545574413
+poke 7 1945473703
+boot:
+bdns sensor nosensor
+bnez RESET calibrate
+move sp 2
+pop r4
+pop r8
+bne r8 SIG calibrate
+j run
+nosensor:
+s db Setting 9000
+yield
+j boot
+calibrate:
+s db Setting 1000
+calwait:
+yield
+jal readsun
+abs r8 r1
+bgt r8 75 calwait
+move r10 -1
+move r9 0
+caltrial:
+mul r4 r9 90
+jal aim
+move r8 30
+calslew:
+yield
+sub r8 r8 1
+bgtz r8 calslew
+jal readratio
+ble r3 r10 caltnext
+move r10 r3
+move r11 r4
+caltnext:
+add r9 r9 1
+blt r9 4 caltrial
+move r4 r11
+poke 0 SIG
+poke 1 r4
+run:
+yield
+jal readsun
+abs r8 r1
+bgt r8 95 setdark
+beqz r15 chkswitch
+move r11 r0
+move r15 0
+j chkswitch
+setdark:
+move r15 1
+chkswitch:
+bdns parkSwitch noswitch
+l r8 parkSwitch PrefabHash
+bne r8 SWITCH noswitch
+l r8 parkSwitch Open
+bge r8 1 manpark
+noswitch:
+bnez r15 dopark
+jal aim
+move r10 r7
+jal readratio
+mul r14 r3 100
+floor r14 r14
+s db Setting r14
+j run
+manpark:
+move r7 90
+jal setpanels
+s db Setting 2001
+j run
+dopark:
+move r7 r10
+add r6 r11 r4
+add r6 r6 0.6
+mod r6 r6 360
+jal setpanels
+s db Setting 2000
+j run
+readsun:
+l r0 sensor Horizontal
+l r1 sensor Vertical
+j ra
+readratio:
+move sp 8
+move r3 0
+rrloop:
+pop r8
+lb r13 r8 Ratio Maximum
+max r3 r3 r13
+bgt sp 3 rrloop
+bdse calibrationPanel rrd2
+j ra
+rrd2:
+l r3 calibrationPanel Ratio
+j ra
+aim:
+add r6 r0 r4
+add r6 r6 0.6
+mod r6 r6 360
+sub r7 90.2 r1
+setpanels:
+move sp 8
+swp:
+pop r8
+sb r8 Vertical r7
+sb r8 Horizontal r6
+add r13 r6 90
+mod r13 r13 360
+sbn r8 HASH("Solar Panel +90") Horizontal r13
+add r13 r6 -90
+mod r13 r13 360
+sbn r8 HASH("Solar Panel -90") Horizontal r13
+add r13 r6 180
+mod r13 r13 360
+sbn r8 HASH("Solar Panel +180") Horizontal r13
+bgt sp 3 swp
+j ra
