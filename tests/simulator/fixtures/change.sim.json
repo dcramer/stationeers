@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "script": "change.ic10",
+  "steps": 2,
+  "devices": [],
+  "changes": [
+    {
+      "afterStep": 1,
+      "registers": {
+        "r0": 42
+      }
+    }
+  ],
+  "expect": {
+    "registers": {
+      "r1": 42
+    },
+    "nextLine": 2
+  }
+}

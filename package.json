@@ -1,0 +1,13 @@
+{
+  "name": "stationeers-ic10-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "simulate": "bun run tools/sim_ic10.ts validate scripts",
+    "test:sim": "bun test tests/simulator"
+  },
+  "devDependencies": {
+    "@stationeers-ic/ic10": "0.3.7",
+    "json5": "2.2.3"
+  }
+}

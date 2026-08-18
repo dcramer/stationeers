@@ -26,7 +26,9 @@ game-ready, and easy to configure from an IC Housing.
 - `scripts/<name>/README.md` documents the program or setup's hardware, pins,
   setup, behavior, and failure handling.
 - `tools/lint_ic10.py` checks layout and the IC10 line limit.
-- `tests/` tests repository tooling; it does not simulate the game.
+- `tools/sim_ic10.ts` optionally parses scripts and runs emulator scenarios.
+- `tests/` tests repository tooling and the simulation harness; neither
+  reproduces the full game.
 
 ## IC10 rules
 
@@ -67,16 +69,18 @@ Document, when applicable:
 
 ## Validation
 
-Run from the repository root before finishing:
+With Bun installed, run the complete validation from the repository root:
 
 ```sh
-make lint
-make test
+make validate
 ```
 
-When changing Python tooling, add or update tests under `tests/`. The linter
-does not parse IC10 or emulate Stationeers; review control flow and distinguish
-in-game verification from untested assumptions.
+This installs the locked Bun dependencies, runs the Python checks, statically
+parses every IC10 file, automatically runs sibling `*.sim.json` scenarios, and
+tests the simulation harness. `make lint` and `make test` remain available when
+Bun is unavailable; the linter does not parse or emulate IC10. Review control
+flow and distinguish emulator coverage, in-game verification, and untested
+assumptions.
 
 ## Change discipline
 

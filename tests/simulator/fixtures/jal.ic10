@@ -1,0 +1,6 @@
+jal subroutine
+move r0 42
+j done
+subroutine:
+j ra
+done:

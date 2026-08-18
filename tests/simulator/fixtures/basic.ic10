@@ -1,0 +1,5 @@
+define ZERO 0
+alias Display d0
+move r0 ZERO
+add r0 r0 42
+s Display Setting r0

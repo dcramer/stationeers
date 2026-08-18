@@ -1,0 +1,4 @@
+#!/usr/bin/env bun
+
+const { runCli } = await import("./tools/sim_ic10.ts");
+process.exitCode = await runCli(["validate", process.argv[2] ?? "scripts"]);

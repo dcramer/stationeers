@@ -110,3 +110,14 @@ Known assumptions and edge behavior:
 - Emptying is inferred from AIMeE leaving Mode 4; the script does not inspect all eight ore slots separately. It also keeps waiting until slot-0 charge reaches 70,000. This is the intended AIMeE mode contract, but the physical unload area still has to be functional.
 - A manual lever recall during clear weather closes the hangar, then lowers the lever and starts again on the next clear-state pass. It is a recall trigger, not a persistent off switch.
 - `r3` can carry a small low-velocity count from one navigation leg into the next. Normal movement immediately resets it; with the configured non-identical route legs this does not change behavior.
+
+## Simulator scenarios
+
+Run `./sim aimee-miner` from the repository root. The sibling scenarios cover:
+
+- a safe Mode-1 forecast at 700 seconds, which preserves the raw countdown and continues navigation;
+- a dangerous Mode-1 forecast at 500 seconds, which raises the recall lever and clears the abandoned navigation stack frame;
+- a post-recall restart that remains at Unload while Mode 4 or the charge threshold is incomplete;
+- a completed unload with 70,000 charge, after which the next target is the outbound waypoint.
+
+The scenarios use scheduled external changes to represent AIMeE arriving and completing Mode 4. The emulator does not advance robot movement, unloading, charging, or weather autonomously, so in-game testing is still required for those physical behaviors.

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "script": "jal.ic10",
+  "steps": 6,
+  "devices": [],
+  "expect": {
+    "registers": {
+      "r0": 42,
+      "r17": 1
+    },
+    "nextLine": 6
+  }
+}

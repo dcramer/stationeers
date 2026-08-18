@@ -60,8 +60,8 @@ and comments count toward that limit.
 
 ## Checks
 
-Python 3 is the only local requirement. Run the repository checks before using
-a script in game:
+Python 3 is the only requirement for the base checks. Run them before using a
+script in game:
 
 ```sh
 make lint
@@ -71,13 +71,31 @@ make test
 `make lint` verifies the script layout, sibling README, UTF-8 encoding, and
 128-line limit. `make test` runs unit tests for the repository tooling.
 
-These checks do not parse IC10 or simulate Stationeers. Device properties,
-network topology, hashes, and control behavior must still be verified in
-Stationpedia and tested in game. The instruction reference records its source
-game-data version so version-sensitive assumptions remain visible.
+For the complete repository and simulator validation, install Bun and run one
+command:
+
+```sh
+make validate
+```
+
+It installs the locked dependencies, runs the base checks, parses every script,
+automatically discovers sibling `*.sim.json` scenarios, and tests the simulator
+harness. To simulate only the script you are editing, use its short directory
+name:
+
+```sh
+./sim aimee-miner
+```
+
+Use `make simulate` for a faster simulator-only pass across every script.
+See [IC10 simulator](docs/ic10-simulator.md) for scenario configuration,
+licensing, and limitations. Device properties, network topology, hashes, and
+control behavior must still be verified in Stationpedia and tested in game.
 
 ## Status
 
-This is a small working collection, not a packaged IC10 compiler or emulator.
-Scripts may contain documented limitations or require local coordinates and
-device assignments; read each script's README before loading it onto a chip.
+This is a small working collection, not a packaged IC10 compiler. Its optional
+simulation harness uses a third-party emulator and does not replace in-game
+testing. Scripts may contain documented limitations or require local
+coordinates and device assignments; read each script's README before loading
+it onto a chip.

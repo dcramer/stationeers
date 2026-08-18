@@ -6,7 +6,9 @@ Keep each standalone script in a dedicated directory:
 scripts/
 └── example-controller/
     ├── example-controller.ic10
-    └── README.md
+    ├── README.md
+    ├── normal-operation.sim.json
+    └── failure-recovery.sim.json
 ```
 
 A setup that requires multiple cooperating ICs may keep all of its `.ic10`
@@ -50,3 +52,16 @@ that still needs in-game verification.
 
 For a complex script, also document its register map and the meanings of any
 device modes or state values.
+
+## Simulator scenarios
+
+Keep zero or more `*.sim.json` scenarios beside the script. `make validate`
+finds them automatically; no central test list needs updating. Start with one
+normal-operation case, then add separate cases for important shutdown, missing
+device, and recovery paths. Multi-program setups should identify the target
+`.ic10` file in each scenario's `script` field.
+
+Use the compact scenario format and examples in
+[`docs/ic10-simulator.md`](../docs/ic10-simulator.md). Scripts without scenarios
+still receive static instruction and operand validation, and the validation
+output reports how many scripts have behavioral scenario coverage.
