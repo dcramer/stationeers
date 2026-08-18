@@ -1,17 +1,77 @@
 # Stationeers IC10 workspace
 
-Local notes and scripts for debugging Stationeers IC10 programs.
+An organized workspace for writing, documenting, and checking IC10 programs for
+[Stationeers](https://store.steampowered.com/app/544550/Stationeers/).
 
-- [IC10 instruction reference](docs/ic10-instructions.md) — compact syntax and description for every instruction.
-- [Script conventions](scripts/README.md) — layout and README template for IC10 scripts.
+## Repository layout
+
+```text
+.
+├── AGENTS.md                 # Guidance for coding agents and contributors
+├── docs/
+│   └── ic10-instructions.md # Local IC10 syntax reference
+├── scripts/
+│   ├── README.md            # Script layout and documentation template
+│   └── <script-name>/
+│       ├── <script-name>.ic10
+│       └── README.md        # Wiring, setup, behavior, and limitations
+├── tests/                   # Tests for repository tooling
+└── tools/
+    └── lint_ic10.py         # Layout and line-count checks
+```
+
+Current programs:
+
+- [AIMeE miner](scripts/aimee-miner/README.md) — automated mining, unloading,
+  charging, weather recall, hangar control, and status displays.
+
+References and conventions:
+
+- [IC10 instruction reference](docs/ic10-instructions.md) — compact local
+  syntax and descriptions.
+- [Script conventions](scripts/README.md) — directory layout and README
+  template.
+- [Agent guidance](AGENTS.md) — repository-specific editing and validation
+  rules.
+
+## Adding a script
+
+Create one directory per program, using the same lowercase kebab-case name for
+the directory and script:
+
+```text
+scripts/airlock-controller/
+├── airlock-controller.ic10
+└── README.md
+```
+
+Document hardware, IC Housing pin assignments, configurable values, operating
+behavior, and known limitations in the sibling README. Keep configuration
+constants near the beginning of the program.
+
+IC10 programs are limited to 128 physical lines in the game editor. Blank lines
+and comments count toward that limit.
 
 ## Checks
 
-Run the repository checks before using a script in game:
+Python 3 is the only local requirement. Run the repository checks before using
+a script in game:
 
 ```sh
 make lint
 make test
 ```
 
-The linter requires every script to live in its own folder with a `README.md` and rejects scripts over Stationeers' 128-line limit. Comments and blank lines count toward the limit.
+`make lint` verifies the script layout, sibling README, UTF-8 encoding, and
+128-line limit. `make test` runs unit tests for the repository tooling.
+
+These checks do not parse IC10 or simulate Stationeers. Device properties,
+network topology, hashes, and control behavior must still be verified in
+Stationpedia and tested in game. The instruction reference records its source
+game-data version so version-sensitive assumptions remain visible.
+
+## Status
+
+This is a small working collection, not a packaged IC10 compiler or emulator.
+Scripts may contain documented limitations or require local coordinates and
+device assignments; read each script's README before loading it onto a chip.
