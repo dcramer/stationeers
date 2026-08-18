@@ -1,0 +1,125 @@
+# Hash IC adapted from Barsiel's work; see README.
+define DIAL 554524804
+define BUTTON 491845673
+define LEVER 1220484876
+define VENT -1129453144
+alias hash db
+main:
+sbn DIAL HASH("Ingot") Mode 17
+sbn DIAL HASH("Amount") Mode 30
+sb 435685051 On 1
+lbn r7 LEVER HASH("Override") Open 1
+lbn r13 LEVER HASH("Vent") Open 2
+beqzal r13 VentOn
+bnezal r13 VentOff
+jal Mixer
+lbn r0 DIAL HASH("Ingot") Setting 2
+lbn r1 BUTTON HASH("Confirm") Setting 2
+lbn r5 DIAL HASH("Amount") Setting 2
+yield
+lbn r15 2037291645 HASH("Silos CD") Setting 2
+bltz r15 off
+move r6 r5
+brnez r5 3
+sbn DIAL HASH("Amount") Setting 1
+move r5 1
+brle r0 17 2
+sbn DIAL HASH("Ingot") Setting 17
+brgt r0 7 2
+mul r6 r6 50
+brne r0 8 2
+mul r6 r6 200
+brgt r0 13 2
+brlt r0 13 3
+mul r6 r6 50
+jr 3
+brle r0 8 2
+mul r6 r6 100
+blez r0 off
+beqal r1 1 Set
+sub r0 r0 1
+mul r0 r0 3
+sbn -815193061 HASH("Amount") Setting r6
+add r0 r0 1
+brnez r0 r0
+s hash Setting -1301215609 # Iron
+move r2 0.00950100000010010000
+j main
+s hash Setting -404336834 # Copper
+move r2 0.00950100000100010000
+j main
+s hash Setting 226410516 # Gold
+move r2 0.00950100000100010000
+j main
+s hash Setting -290196476 # Silicon
+move r2 0.00950100000100010000
+j main
+s hash Setting -929742000 # Silver
+move r2 0.00950100000100010000
+j main
+s hash Setting 2134647745 # Lead
+move r2 0.00950100000100010000
+j main
+s hash Setting -1406385572 # Nickel
+move r2 0.00950100000100010000
+j main
+s hash Setting -654790771 # Steel
+move r2 0.00900100000100010000
+j main
+s hash Setting -297990285 # Invar
+move r2 0.01200015001800020000
+j main
+s hash Setting -82508479 # Solder
+move r2 0.00350005500100010000
+j main
+s hash Setting 502280180 # Electrum
+move r2 0.00600100000080002350
+j main
+s hash Setting 1058547521 # Constantan
+move r2 0.01000100002000055000
+j main
+s hash Setting 156348098 # Waspaloy
+move r2 0.00400008005000055000
+j main
+s hash Setting -787796599 # Inconel
+move r2 0.00600100002350023800
+j main
+s hash Setting 412924554 # Astroloy
+move r2 0.01000100003000040000
+j main
+s hash Setting 1579842814 # Hastelloy
+move r2 0.00950010002500030000
+j main
+s hash Setting -1897868623 # Stellite
+move r2 0.01800100001000019500
+j main
+off:
+s hash Setting 0
+j main
+Set:
+yield
+sbn 2037291645 HASH("Furnace IC") Setting r2
+j ra
+VentOn:
+sbn VENT HASH("Vent 1") Mode 0
+sbn VENT HASH("Vent 1") PressureExternal 101
+sbn VENT HASH("Vent 1") PressureInternal 0
+sbn VENT HASH("Vent 2") Mode 1
+sbn VENT HASH("Vent 2") PressureExternal 101
+sbn VENT HASH("Vent 2") PressureInternal 55000
+sbn VENT HASH("Vent 1") On 1
+sbn VENT HASH("Vent 2") On 1
+j ra
+VentOff:
+sbn VENT HASH("Vent 1") PressureExternal 0
+sbn VENT HASH("Vent 2") PressureExternal 0
+j ra
+Mixer:
+lbn r12 435685051 HASH("O2 PA") Temperature 2
+lbn r13 435685051 HASH("CH4 PA") Temperature 2
+mul r14 r13 2
+div r14 r12 r14
+add r14 r14 1
+div r14 100 r14
+sbn 2104106366 HASH("Fuel Mixer") Setting r14
+j ra

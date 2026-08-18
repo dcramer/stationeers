@@ -70,6 +70,23 @@ class Ic10LinterTests(unittest.TestCase):
             problems, _ = lint(root)
             self.assertTrue(any("own subdirectory" in p for p in problems))
 
+    def test_accepts_multiple_programs_in_one_setup_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            script_directory = root / "multi-controller"
+            script_directory.mkdir()
+            (script_directory / "input.ic10").write_text(
+                "yield\nj 0\n", encoding="utf-8"
+            )
+            (script_directory / "output.ic10").write_text(
+                "yield\nj 0\n", encoding="utf-8"
+            )
+            (script_directory / "README.md").write_text(
+                "# Multi-controller\n", encoding="utf-8"
+            )
+
+            self.assertEqual(lint(root), ([], 2))
+
     def test_final_newline_is_not_an_extra_line(self) -> None:
         self.assertEqual(physical_line_count("yield\n"), 1)
         self.assertEqual(physical_line_count("yield\n\n"), 2)

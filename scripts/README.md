@@ -1,6 +1,6 @@
 # IC10 scripts
 
-Keep each script in a dedicated directory:
+Keep each standalone script in a dedicated directory:
 
 ```text
 scripts/
@@ -8,6 +8,11 @@ scripts/
     ├── example-controller.ic10
     └── README.md
 ```
+
+A setup that requires multiple cooperating ICs may keep all of its `.ic10`
+programs in one directory with one shared `README.md`. Use descriptive,
+lowercase kebab-case filenames and document which program belongs in each IC
+housing.
 
 The `.ic10` file may contain at most 128 physical lines. Blank lines and comments count because the game editor counts them too. Run `make lint` from the repository root to check every script.
 

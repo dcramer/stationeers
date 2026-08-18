@@ -22,10 +22,7 @@ def lint(root: Path) -> tuple[list[str], int]:
     if not root.is_dir():
         return ([f"{root}: scripts directory does not exist"], 0)
 
-    scripts_by_directory: dict[Path, list[Path]] = {}
     for script in scripts:
-        scripts_by_directory.setdefault(script.parent, []).append(script)
-
         if script.parent == root:
             problems.append(
                 f"{script}: script must be inside its own subdirectory"
@@ -47,14 +44,6 @@ def lint(root: Path) -> tuple[list[str], int]:
             problems.append(
                 f"{script}: {line_count} lines; maximum is {MAX_LINES} "
                 "(comments and blanks count)"
-            )
-
-    for directory, directory_scripts in scripts_by_directory.items():
-        if len(directory_scripts) > 1:
-            names = ", ".join(script.name for script in directory_scripts)
-            problems.append(
-                f"{directory}: each script needs its own directory and README.md; "
-                f"found {names}"
             )
 
     return problems, len(scripts)
@@ -85,4 +74,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

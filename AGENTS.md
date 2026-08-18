@@ -20,16 +20,19 @@ game-ready, and easy to configure from an IC Housing.
 
 ## Repository shape
 
-- `scripts/<name>/<name>.ic10` contains one program.
-- `scripts/<name>/README.md` documents its hardware, pins, setup, behavior, and
-  failure handling.
+- `scripts/<name>/<name>.ic10` contains one standalone program. A setup that
+  requires multiple cooperating programs may keep them together in the same
+  directory.
+- `scripts/<name>/README.md` documents the program or setup's hardware, pins,
+  setup, behavior, and failure handling.
 - `tools/lint_ic10.py` checks layout and the IC10 line limit.
 - `tests/` tests repository tooling; it does not simulate the game.
 
 ## IC10 rules
 
-- Use the same lowercase kebab-case name for the script directory and `.ic10`
-  file, with a sibling `README.md`.
+- Use the same lowercase kebab-case name for a standalone script directory and
+  `.ic10` file, with a sibling `README.md`. For a multi-program setup, use
+  descriptive lowercase kebab-case filenames and one shared sibling README.
 - Stay at or below 128 physical lines. Comments and blank lines count, so keep
   source comments brief and put setup detail in the README.
 - Use readable aliases for assigned screws (`d0` through `d5`) and uppercase
