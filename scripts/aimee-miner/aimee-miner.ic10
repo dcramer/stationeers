@@ -1,0 +1,128 @@
+define WaypointX 290
+define WaypointZ -200
+define UnloadX 303
+define UnloadZ -229
+define MineX 260
+define MineZ -200
+define HomeX 303
+define HomeZ -229
+alias Transmitter d0
+alias dispX d1
+alias dispZ d2
+alias dispM d3
+alias dispC d4
+alias lever d5
+define WEATHER 1997212478
+define HANGARDOORHASH -566348148
+define STORMTIME 600
+setup:
+s dispC Color 5
+s dispC Mode 2
+move r6 0
+start:
+sb HANGARDOORHASH Open 1
+move r6 0
+s Transmitter On 1
+move r4 WaypointX
+move r5 WaypointZ
+jal nav
+move r4 UnloadX
+move r5 UnloadZ
+jal nav
+s Transmitter Mode 4
+unloadWait:
+yield
+jal update
+blt r2 70000 unloadWait
+l r0 Transmitter Mode
+beq r0 4 unloadWait
+move r4 WaypointX
+move r5 WaypointZ
+jal nav
+move r4 MineX
+move r5 MineZ
+jal nav
+startMining:
+l r0 Transmitter MineablesInVicinity
+beqz r0 recall
+s Transmitter Mode 3
+mineWait:
+yield
+jal update
+l r0 Transmitter Mode
+beq r0 3 mineWait
+bne r0 6 startMining
+j start
+nav:
+s Transmitter TargetX r4
+s Transmitter TargetZ r5
+push ra
+s Transmitter Mode 2
+wait:
+yield
+jal update
+l r0 Transmitter VelocityMagnitude
+slt r0 r0 0.2
+mul r3 r3 r0
+add r3 r3 r0
+bgt r3 20 pathfind
+l r0 Transmitter Mode
+beq r0 2 wait
+pop ra
+j ra
+pathfind:
+s Transmitter Mode 5
+yield
+jal update
+sleep 10
+s Transmitter Mode 2
+move r3 0
+j wait
+update:
+lb r0 WEATHER NextWeatherEventTime Sum
+snan r0 r0
+s db Setting r0
+lb r8 WEATHER Mode Sum
+beq r6 1 skipSafe
+l r7 lever Open
+bnez r7 recall
+beq r8 2 stormDanger
+bne r8 1 skipSafe
+bge r0 STORMTIME skipSafe
+stormDanger:
+s lever Open 1
+j recall
+skipSafe:
+l r0 Transmitter PositionX
+s dispX Setting r0
+l r0 Transmitter PositionY
+s Transmitter TargetY r0
+l r0 Transmitter PositionZ
+s dispZ Setting r0
+l r1 Transmitter Mode
+s dispM Setting r1
+s dispM Color r1
+ls r2 Transmitter 0 Charge
+s dispC Setting r2
+j ra
+recall:
+move r6 1
+move r4 WaypointX
+move r5 WaypointZ
+jal nav
+move r4 HomeX
+move r5 HomeZ
+jal nav
+s Transmitter Mode 0
+sleep 5
+s Transmitter On 0
+sb HANGARDOORHASH Open 0
+waitClear:
+yield
+lb r0 WEATHER NextWeatherEventTime Sum
+snan r0 r0
+s db Setting r0
+lb r8 WEATHER Mode Sum
+bnez r8 waitClear
+s lever Open 0
+j start
