@@ -1,0 +1,128 @@
+alias commX d0
+alias commZ d1
+alias job d2
+alias command d3
+alias status d4
+alias drone d5
+define WAYPOINT_X 303
+define WAYPOINT_Z -190
+define UNLOAD_X 303
+define UNLOAD_Z -228
+define LOW_BATT 0.5
+define READY_BATT 0.7
+main:
+l r0 command Setting
+bnez r0 home
+s status Setting 0
+l r0 drone Error
+bnez r0 fault
+l r0 drone Mode
+beq r0 6 home
+ls r15 drone 0 ChargeRatio
+blt r15 LOW_BATT home
+l r8 job Setting
+blez r8 wait_job
+l r2 commX Setting
+l r3 commZ Setting
+move r10 0
+jal nav
+mine:
+l r4 drone MineablesInVicinity
+beqz r4 acknowledge
+s drone Mode 3
+mine_wait:
+yield
+l r0 command Setting
+bnez r0 home
+l r0 drone Error
+bnez r0 fault
+ls r15 drone 0 ChargeRatio
+blt r15 LOW_BATT home
+l r4 drone Mode
+beq r4 3 mine_wait
+beq r4 6 home
+j mine
+acknowledge:
+l r8 job Setting
+abs r8 r8
+mul r8 r8 -1
+s job Setting r8
+wait_job:
+yield
+l r0 command Setting
+bnez r0 home
+l r8 job Setting
+blez r8 wait_job
+j main
+home:
+s status Setting 0
+move r10 1
+move r2 WAYPOINT_X
+move r3 WAYPOINT_Z
+jal nav
+move r2 UNLOAD_X
+move r3 UNLOAD_Z
+jal nav
+s drone Mode 4
+unload_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+l r0 drone Mode
+beq r0 4 unload_wait
+ls r15 drone 0 ChargeRatio
+blt r15 READY_BATT unload_wait
+s status Setting 1
+park_wait:
+yield
+l r0 command Setting
+bnez r0 park_wait
+j main
+nav:
+s drone TargetX r2
+s drone TargetZ r3
+l r4 drone PositionY
+s drone TargetY r4
+s drone Mode 2
+move r7 0
+nav_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+beq r10 1 nav_position
+l r0 command Setting
+bnez r0 home
+ls r15 drone 0 ChargeRatio
+blt r15 LOW_BATT home
+nav_position:
+l r4 drone PositionY
+s drone TargetY r4
+l r5 drone PositionX
+l r6 drone PositionZ
+sub r5 r5 r2
+sub r6 r6 r3
+abs r5 r5
+abs r6 r6
+add r5 r5 r6
+ble r5 2 nav_done
+l r0 drone VelocityMagnitude
+slt r0 r0 0.2
+mul r7 r7 r0
+add r7 r7 r0
+bgt r7 20 pathfind
+j nav_wait
+pathfind:
+s drone Mode 5
+sleep 10
+s drone Mode 2
+move r7 0
+j nav_wait
+nav_done:
+j ra
+fault:
+s drone Mode 0
+fault_wait:
+yield
+l r0 drone Error
+bnez r0 fault_wait
+j home

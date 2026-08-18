@@ -16,6 +16,11 @@ programs in one directory with one shared `README.md`. Use descriptive,
 lowercase kebab-case filenames and document which program belongs in each IC
 housing.
 
+Keep superseded or intentionally experimental programs below `archive/` with
+an explicit warning in their README. Archived programs still receive normal
+line-limit, syntax, and scenario validation; the directory is a documentation
+category, not an exclusion from checks.
+
 The `.ic10` file may contain at most 128 physical lines. Blank lines and comments count because the game editor counts them too. Run `make lint` from the repository root to check every script.
 
 Use the same lowercase kebab-case name for the directory and IC10 file. Put

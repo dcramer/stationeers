@@ -1,0 +1,117 @@
+alias commX d0
+alias commZ d1
+alias job d2
+alias command d3
+alias status d4
+alias drone d5
+define STORMTIME 600
+define WEATHER 1997212478
+define HANGAR -566348148
+define SWITCH 1220484876
+define LED -815193061
+define RECALL_NAME HASH("AIMeE Recall")
+define HANGAR_NAME HASH("AIMeE Hangar")
+boot:
+l r0 command Setting
+beq r0 2 complete_wait
+sbn HANGAR HANGAR_NAME Open 1
+s command Setting 1
+j recall_wait
+run:
+sbn HANGAR HANGAR_NAME Open 1
+s command Setting 0
+run_wait:
+yield
+jal displays
+l r0 command Setting
+beq r0 2 complete_wait
+jal danger
+bnez r0 recall
+j run_wait
+recall:
+s command Setting 1
+sbn HANGAR HANGAR_NAME Open 1
+recall_wait:
+yield
+jal displays
+l r0 command Setting
+beq r0 2 complete_wait
+l r0 status Setting
+bne r0 1 recall_wait
+sbn HANGAR HANGAR_NAME Open 0
+recall_hold:
+yield
+jal displays
+l r0 command Setting
+beq r0 2 complete_parked
+jal danger
+bnez r0 recall_hold
+j run
+complete_wait:
+s command Setting 2
+sbn HANGAR HANGAR_NAME Open 1
+complete_return:
+yield
+jal displays
+l r0 status Setting
+bne r0 1 complete_return
+complete_parked:
+sbn HANGAR HANGAR_NAME Open 0
+complete_hold:
+yield
+jal displays
+l r0 command Setting
+beq r0 2 complete_hold
+j boot
+danger:
+lbn r0 SWITCH RECALL_NAME Open Average
+snan r1 r0
+bnez r1 dangerous
+bnez r0 dangerous
+lb r0 WEATHER Mode Average
+snan r1 r0
+bnez r1 dangerous
+beqz r0 safe
+bne r0 1 dangerous
+lb r0 WEATHER NextWeatherEventTime Minimum
+blt r0 STORMTIME dangerous
+safe:
+move r0 0
+j ra
+dangerous:
+move r0 1
+j ra
+displays:
+sbn LED HASH("AIMeE X") Mode 0
+sbn LED HASH("AIMeE Z") Mode 0
+sbn LED HASH("AIMeE Mode") Mode 0
+sbn LED HASH("AIMeE Charge") Mode 0
+sbn LED HASH("AIMeE Target X") Mode 0
+sbn LED HASH("AIMeE Target Z") Mode 0
+sbn LED HASH("AIMeE Job") Mode 0
+sbn LED HASH("AIMeE Command") Mode 0
+sbn LED HASH("AIMeE Status") Mode 0
+sbn LED HASH("AIMeE Storm ETA") Mode 0
+l r0 drone PositionX
+sbn LED HASH("AIMeE X") Setting r0
+l r0 drone PositionZ
+sbn LED HASH("AIMeE Z") Setting r0
+l r0 drone Mode
+sbn LED HASH("AIMeE Mode") Setting r0
+sbn LED HASH("AIMeE Mode") Color r0
+ls r0 drone 0 ChargeRatio
+mul r0 r0 100
+sbn LED HASH("AIMeE Charge") Setting r0
+l r0 commX Setting
+sbn LED HASH("AIMeE Target X") Setting r0
+l r0 commZ Setting
+sbn LED HASH("AIMeE Target Z") Setting r0
+l r0 job Setting
+sbn LED HASH("AIMeE Job") Setting r0
+l r0 command Setting
+sbn LED HASH("AIMeE Command") Setting r0
+l r0 status Setting
+sbn LED HASH("AIMeE Status") Setting r0
+lb r0 WEATHER NextWeatherEventTime Minimum
+sbn LED HASH("AIMeE Storm ETA") Setting r0
+j ra

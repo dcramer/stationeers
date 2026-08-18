@@ -1,0 +1,111 @@
+alias commX d0
+alias commZ d1
+alias job d2
+alias command d3
+alias status d4
+define BASE_X 303
+define BASE_Z -120
+define SAFE_ZONE 25
+define STEP 5
+define MAX_RANGE 120
+define USE_EXCLUSION 1
+define EXCLUDE_X_MIN 270
+define EXCLUDE_X_MAX 328
+define EXCLUDE_Z_MIN -364
+define EXCLUDE_Z_MAX -214
+main:
+yield
+l r0 command Setting
+beq r0 2 done
+bnez r0 main
+l r1 job Setting
+beqz r1 initialize
+bltz r1 advance
+j wait_ack
+initialize:
+div r2 SAFE_ZONE STEP
+ceil r2 r2
+mul r1 r2 2
+sub r1 r1 1
+mul r1 r1 r1
+j calculate
+advance:
+abs r1 r1
+add r1 r1 1
+calculate:
+add r2 r1 1
+sqrt r2 r2
+sub r2 r2 1
+div r2 r2 2
+ceil r2 r2
+mul r3 r2 STEP
+bgt r3 MAX_RANGE finish
+mul r6 r2 2
+add r3 r6 1
+mul r3 r3 r3
+sub r7 r3 1
+sub r7 r7 r1
+blt r7 r6 edge_bottom
+mul r8 r6 2
+blt r7 r8 edge_left
+mul r8 r6 3
+blt r7 r8 edge_top
+move r4 r2
+sub r7 r7 r8
+sub r5 r2 r7
+j scale
+edge_bottom:
+sub r4 r2 r7
+mul r5 r2 -1
+j scale
+edge_left:
+mul r4 r2 -1
+sub r7 r7 r6
+mul r5 r2 -1
+add r5 r5 r7
+j scale
+edge_top:
+mul r8 r6 2
+sub r7 r7 r8
+mul r4 r2 -1
+add r4 r4 r7
+move r5 r2
+scale:
+mul r4 r4 STEP
+mul r5 r5 STEP
+mul r8 r4 r4
+mul r9 r5 r5
+add r8 r8 r9
+sqrt r8 r8
+bgt r8 MAX_RANGE skip
+add r11 r4 BASE_X
+add r12 r5 BASE_Z
+beqz USE_EXCLUSION publish
+blt r11 EXCLUDE_X_MIN publish
+bgt r11 EXCLUDE_X_MAX publish
+blt r12 EXCLUDE_Z_MIN publish
+bgt r12 EXCLUDE_Z_MAX publish
+j skip
+publish:
+s commX Setting r11
+s commZ Setting r12
+s job Setting r1
+wait_ack:
+yield
+l r0 command Setting
+beq r0 2 done
+bnez r0 wait_ack
+l r0 job Setting
+bgtz r0 wait_ack
+j main
+skip:
+add r1 r1 1
+yield
+j calculate
+finish:
+s command Setting 2
+done:
+yield
+l r0 command Setting
+beq r0 2 done
+j main

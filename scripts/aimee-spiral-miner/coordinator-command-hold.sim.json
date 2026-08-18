@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "script": "coordinator.ic10",
+  "steps": 80,
+  "devices": [
+    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 328 } },
+    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -140 } },
+    { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": -81 } },
+    { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 1 } },
+    { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 1 } }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "Setting": 328 },
+      "21": { "Setting": -140 },
+      "22": { "Setting": -81 },
+      "23": { "Setting": 1 },
+      "24": { "Setting": 1 }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+# Adapted from KingNyx AIMeE v6.5
+alias commX d0
+alias commZ d1
+alias dbX d2
+alias dbZ d3
+define BASE_X -564
+define BASE_Z 202
+define SAFE_ZONE 50
+define STEP 5
+start:
+yield
+l r1 dbX Setting
+l r2 dbZ Setting
+beqz r1 initialize
+bltz r1 advance
+j publish
+initialize:
+move r1 SAFE_ZONE
+move r2 0
+j publish
+advance:
+abs r1 r1
+add r1 r1 STEP
+publish:
+s dbX Setting r1
+s dbZ Setting r2
+add r11 r1 BASE_X
+add r12 r2 BASE_Z
+s commX Setting r11
+s commZ Setting r12
+wait_ack:
+yield
+l r0 dbX Setting
+bgez r0 wait_ack
+j start

@@ -14,6 +14,7 @@ An organized workspace for writing, documenting, and checking IC10 programs for
 │   └── prefab-hashes.md     # Versioned Stationpedia prefab hash catalog
 ├── scripts/
 │   ├── README.md            # Script layout and documentation template
+│   ├── archive/             # Learning examples, not dependable automation
 │   └── <script-name>/
 │       ├── <script-name>.ic10
 │       └── README.md        # Wiring, setup, behavior, and limitations
@@ -26,6 +27,14 @@ Current programs:
 
 - [AIMeE miner](scripts/aimee-miner/README.md) — automated mining, unloading,
   charging, weather recall, hangar control, and status displays.
+- [AIMeE spiral miner](scripts/aimee-spiral-miner/README.md) — coordinated
+  three-IC, single-bot spiral mining with recall, hangar supervision, displays,
+  and recovery.
+
+Archived learning examples:
+
+- [AIMeE strip miner](scripts/archive/aimee-strip-miner/README.md) — corrected
+  two-IC experiment with substantial documented limitations.
 
 References and conventions:
 

@@ -1,0 +1,128 @@
+alias commX d0
+alias commZ d1
+alias ackX d2
+alias lever d3
+alias drone d5
+define UNLOAD_X -564
+define UNLOAD_Z 202
+define WAIT_Z 302
+define LOW_BATT 0.1
+define READY_BATT 0.7
+define ARRIVE 2
+main:
+yield
+l r8 ackX Setting
+bltz r8 wait_target
+l r0 drone Error
+bnez r0 fault
+l r0 drone Mode
+beq r0 6 home
+ls r15 drone 0 ChargeRatio
+blt r15 LOW_BATT home
+l r8 lever Setting
+bnez r8 home
+l r2 commX Setting
+l r3 commZ Setting
+s drone TargetX r2
+s drone TargetZ r3
+l r4 drone PositionY
+s drone TargetY r4
+s drone Mode 2
+outbound_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+ls r15 drone 0 ChargeRatio
+blt r15 LOW_BATT home
+l r8 lever Setting
+bnez r8 home
+l r5 drone PositionX
+l r6 drone PositionZ
+sub r5 r5 r2
+sub r6 r6 r3
+abs r5 r5
+abs r6 r6
+add r7 r5 r6
+bgt r7 ARRIVE outbound_wait
+mine:
+l r4 drone MineablesInVicinity
+beqz r4 acknowledge
+s drone Mode 3
+mine_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+ls r15 drone 0 ChargeRatio
+blt r15 LOW_BATT home
+l r8 lever Setting
+bnez r8 home
+l r4 drone Mode
+beq r4 3 mine_wait
+beq r4 6 home
+j mine
+acknowledge:
+l r8 ackX Setting
+abs r8 r8
+mul r8 r8 -1
+s ackX Setting r8
+wait_target:
+yield
+l r8 ackX Setting
+bltz r8 wait_target
+j main
+home:
+s drone TargetX UNLOAD_X
+s drone TargetZ WAIT_Z
+l r4 drone PositionY
+s drone TargetY r4
+s drone Mode 2
+waypoint_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+l r5 drone PositionX
+l r6 drone PositionZ
+sub r5 r5 UNLOAD_X
+sub r6 r6 WAIT_Z
+abs r5 r5
+abs r6 r6
+add r7 r5 r6
+bgt r7 ARRIVE waypoint_wait
+s drone TargetX UNLOAD_X
+s drone TargetZ UNLOAD_Z
+l r4 drone PositionY
+s drone TargetY r4
+s drone Mode 2
+unload_arrival_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+l r5 drone PositionX
+l r6 drone PositionZ
+sub r5 r5 UNLOAD_X
+sub r6 r6 UNLOAD_Z
+abs r5 r5
+abs r6 r6
+add r7 r5 r6
+bgt r7 ARRIVE unload_arrival_wait
+s drone Mode 4
+unload_wait:
+yield
+l r0 drone Error
+bnez r0 fault
+l r0 drone Mode
+beq r0 4 unload_wait
+ls r15 drone 0 ChargeRatio
+blt r15 READY_BATT unload_wait
+lever_wait:
+yield
+l r8 lever Setting
+bnez r8 lever_wait
+j main
+fault:
+s drone Mode 0
+fault_wait:
+yield
+l r0 drone Error
+bnez r0 fault_wait
+j home
