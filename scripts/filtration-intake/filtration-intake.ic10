@@ -1,0 +1,51 @@
+alias vent d0
+alias analyzer d1
+alias pressure r0
+alias temperature r1
+alias limit r2
+alias status r3
+define MAX_WARM_PRESSURE 40000
+define WARM_DESIGN_TEMP 373.15
+define MIN_FILL_TEMP 150
+define RESTART_RATIO 0.9
+init:
+s vent On 0
+s vent Mode 1
+s vent Lock 1
+off:
+s vent On 0
+yield
+l status analyzer Power
+beqz status off
+l status analyzer Error
+bnez status off
+l pressure analyzer Pressure
+l temperature analyzer Temperature
+bnan pressure off
+bnan temperature off
+max temperature temperature MIN_FILL_TEMP
+mul limit MAX_WARM_PRESSURE temperature
+div limit limit WARM_DESIGN_TEMP
+min limit limit MAX_WARM_PRESSURE
+mul limit limit RESTART_RATIO
+blt pressure limit filling
+j off
+filling:
+yield
+s vent On 0
+l status analyzer Power
+beqz status off
+l status analyzer Error
+bnez status off
+l pressure analyzer Pressure
+l temperature analyzer Temperature
+bnan pressure off
+bnan temperature off
+max temperature temperature MIN_FILL_TEMP
+mul limit MAX_WARM_PRESSURE temperature
+div limit limit WARM_DESIGN_TEMP
+min limit limit MAX_WARM_PRESSURE
+bge pressure limit off
+s vent Mode 1
+s vent On 1
+j filling

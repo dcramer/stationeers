@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "script": "filtration-intake.ic10",
+  "steps": 90,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "StructurePoweredVentLarge",
+      "pin": "d0",
+      "props": { "On": 1, "Mode": 1, "Lock": 0 }
+    },
+    {
+      "id": 21,
+      "prefab": "StructurePipeAnalysizer",
+      "pin": "d1",
+      "props": { "Power": 1, "Error": 0, "Pressure": 21000, "Temperature": 210 }
+    }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "On": 0, "Mode": 1, "Lock": 1 }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+define ANALYZER 435685051
+define FILTER -348054045
+define INPUT_NAME HASH("Filter Input")
+define N2O_NAME HASH("Nitrous Oxide")
+define O2_NAME HASH("Oxygen")
+define H2_NAME HASH("Hydrogen")
+define CH4_NAME HASH("Methane")
+define POL_NAME HASH("Pollutant")
+define N2_NAME HASH("Nitrogen")
+define CO2_NAME HASH("Carbon Dioxide")
+define PARTIAL_START 50
+define PARTIAL_STOP 20
+define PRODUCT_START 15000
+define PRODUCT_STOP 30000
+define MIN_FILTER_LIFE 5
+loop:
+yield
+lbn r13 ANALYZER INPUT_NAME Pressure Average
+lbn r0 ANALYZER INPUT_NAME RatioNitrousOxide Average
+move r1 N2O_NAME
+jal control
+lbn r0 ANALYZER INPUT_NAME RatioOxygen Average
+move r1 O2_NAME
+jal control
+lbn r0 ANALYZER INPUT_NAME RatioHydrogen Average
+move r1 H2_NAME
+jal control
+lbn r0 ANALYZER INPUT_NAME RatioMethane Average
+move r1 CH4_NAME
+jal control
+lbn r0 ANALYZER INPUT_NAME RatioPollutant Average
+move r1 POL_NAME
+jal control
+lbn r0 ANALYZER INPUT_NAME RatioNitrogen Average
+move r1 N2_NAME
+jal control
+lbn r0 ANALYZER INPUT_NAME RatioCarbonDioxide Average
+move r1 CO2_NAME
+jal control
+j loop
+control:
+lbn r2 FILTER r1 On Maximum
+sgtz r2 r2
+select r3 r2 PARTIAL_STOP PARTIAL_START
+mul r4 r13 r0
+sge r7 r4 r3
+lbn r5 ANALYZER r1 Pressure Average
+select r6 r2 PRODUCT_STOP PRODUCT_START
+slt r8 r5 r6
+and r7 r7 r8
+lbns r8 FILTER r1 0 Quantity Maximum
+lbns r9 FILTER r1 1 Quantity Maximum
+max r8 r8 r9
+sgt r8 r8 MIN_FILTER_LIFE
+and r7 r7 r8
+sbn FILTER r1 On r7
+j ra
