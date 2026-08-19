@@ -4,10 +4,10 @@ alias job d2
 alias command d3
 alias status d4
 alias drone d5
-define WAYPOINT_X 303
-define WAYPOINT_Z -190
-define UNLOAD_X 303
-define UNLOAD_Z -228
+define WAYPOINT_X 282
+define WAYPOINT_Z -221
+define UNLOAD_X 302
+define UNLOAD_Z -221
 define LOW_BATT 0.5
 define READY_BATT 0.7
 main:
@@ -97,14 +97,8 @@ blt r15 LOW_BATT home
 nav_position:
 l r4 drone PositionY
 s drone TargetY r4
-l r5 drone PositionX
-l r6 drone PositionZ
-sub r5 r5 r2
-sub r6 r6 r3
-abs r5 r5
-abs r6 r6
-add r5 r5 r6
-ble r5 2 nav_done
+l r0 drone Mode
+beqz r0 nav_done
 l r0 drone VelocityMagnitude
 slt r0 r0 0.2
 mul r7 r7 r0

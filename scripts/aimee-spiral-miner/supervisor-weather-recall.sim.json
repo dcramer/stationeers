@@ -3,8 +3,8 @@
   "script": "supervisor.ic10",
   "steps": 260,
   "devices": [
-    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 328 } },
-    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -140 } },
+    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 187 } },
+    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": 81 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 0 } },
     { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 1 } },
@@ -13,7 +13,7 @@
       "prefab": "Robot",
       "pin": "d5",
       "virtual": true,
-      "props": { "PositionX": 303, "PositionZ": -228, "Mode": 0 },
+      "props": { "PositionX": 302, "PositionZ": -221, "Mode": 0 },
       "slots": [{ "index": 0, "item": "ItemBatteryCellLarge" }]
     },
     { "id": 26, "prefab": "StructureLogicSwitch", "name": "AIMeE Recall", "props": { "Open": 0 } },

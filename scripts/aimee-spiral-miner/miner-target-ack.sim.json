@@ -3,8 +3,8 @@
   "script": "miner.ic10",
   "steps": 140,
   "devices": [
-    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 328 } },
-    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -140 } },
+    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 187 } },
+    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": 81 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 0 } },
     { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 1 } },
@@ -16,9 +16,9 @@
       "props": {
         "Error": 0,
         "Mode": 0,
-        "PositionX": 328,
+        "PositionX": 187,
         "PositionY": 4,
-        "PositionZ": -140,
+        "PositionZ": -241,
         "VelocityMagnitude": 1,
         "MineablesInVicinity": 0
       },
@@ -26,14 +26,15 @@
     }
   ],
   "changes": [
-    { "afterStep": 0, "slots": { "25": { "0": { "ChargeRatio": 1 } } } }
+    { "afterStep": 0, "slots": { "25": { "0": { "ChargeRatio": 1 } } } },
+    { "afterStep": 90, "devices": { "25": { "Mode": 0 } } }
   ],
   "expect": {
     "devices": {
       "22": { "Setting": -81 },
       "23": { "Setting": 0 },
       "24": { "Setting": 0 },
-      "25": { "TargetX": 328, "TargetY": 4, "TargetZ": -140 }
+      "25": { "TargetX": 187, "TargetY": 4, "TargetZ": -241 }
     }
   }
 }

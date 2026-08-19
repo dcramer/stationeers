@@ -29,6 +29,7 @@ supervisor never advances the spiral, and only the miner writes parked status.
   AIMeE
 - 1 powered Weather Station
 - 1 Lever named exactly `AIMeE Recall`
+- 1 optional Logic Button named exactly `AIMeE Reset`
 - 1 Medium Hangar Door named exactly `AIMeE Hangar`
 - 5 Logic Memory devices shared by all three housings
 - An unloading chute or bin and a charger at the unload position
@@ -65,8 +66,8 @@ AIMeE recalled.
 ### Wiring and naming checklist
 
 1. Connect the three IC housings, five memories, Logic Transmitter, Weather
-   Station, recall Lever, hangar sections, and any displays to the same base
-   power/data network.
+   Station, recall Lever, reset button, hangar sections, and any displays to the
+   same base power/data network.
 2. Assign the same five memories to `d0` through `d4` on every housing using the
    table above. Memory names do not affect the scripts.
 3. Leave coordinator `d5` unassigned. Put one powered Logic Transmitter in
@@ -77,16 +78,19 @@ AIMeE recalled.
    and does not provide the AIMeE selection list.
 4. Name the Lever exactly `AIMeE Recall`. It is discovered by type and name and
    is not assigned to an IC pin.
-5. Name every controlled Medium Hangar Door section exactly `AIMeE Hangar`.
+5. For push-button reset, name a Logic Button exactly `AIMeE Reset`. It is
+   discovered by type and name and is not assigned to an IC pin. A missing
+   reset button is harmless.
+6. Name every controlled Medium Hangar Door section exactly `AIMeE Hangar`.
    Hangar sections are discovered by type and name and are not assigned to pins.
-6. Leave the Weather Station name unchanged; it is discovered by prefab type
+7. Leave the Weather Station name unchanged; it is discovered by prefab type
    and is not assigned to a pin. Keep it powered and on the shared network.
-7. If displays are installed, use the exact case-sensitive names in the
+8. If displays are installed, use the exact case-sensitive names in the
    Optional displays table. Displays are network devices, not pin assignments.
 
 No IC housing, Logic Memory, Weather Station, or Logic Transmitter name is
-required by the code. Only `AIMeE Recall`, `AIMeE Hangar`, and the optional
-display names are hashed by name.
+required by the code. Only `AIMeE Recall`, `AIMeE Reset`, `AIMeE Hangar`, and
+the optional display names are hashed by name.
 
 ## Coordinates and thresholds
 
@@ -94,8 +98,8 @@ Coordinator defaults:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `BASE_X` | 303 | Spiral center X, north of the hangar |
-| `BASE_Z` | -120 | Spiral center Z, beyond the safe entry |
+| `BASE_X` | 162 | Spiral center X, due west of the hangar |
+| `BASE_Z` | -221 | Spiral center Z, aligned with the approach |
 | `SAFE_ZONE` | 25 | First complete square ring's distance from center |
 | `STEP` | 5 | Grid spacing between mining targets |
 | `MAX_RANGE` | 120 | Maximum circular distance from center |
@@ -113,29 +117,31 @@ The supplied exclusion bounds already include the intended AIMeE roaming
 margin. The coordinator therefore uses them directly and does not add another
 automatic margin.
 
-The mining center `(303, -120)` lies north of the safe entry `(303, -190)`, away
-from the base exclusion zone. It is 70 meters beyond the safe entry and about
-108 meters from the intake chute. With `MAX_RANGE` 120, the farthest target is
-about 228 meters from the chute. The exclusion rectangle intersects the
-southern edge of the mining circle, so targets that would enter the protected
-base area are skipped.
+The mining center `(162, -221)` lies 140 meters due west of the unload point
+`(302, -221)`. The waypoint `(282, -221)` is 20 meters west of unload, so the
+final approach travels due east. With `MAX_RANGE` 120, generated targets extend
+from X 42 through X 282 and never cross the waypoint line toward the base.
+AIMeE can roam about 15 meters from a target, so its eastern roaming edge can
+reach approximately X 297. The farthest target is about 260 meters from the
+chute. The existing exclusion rectangle remains unchanged.
 
 Miner defaults:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `WAYPOINT_X` | 303 | Clear hangar-entry point X |
-| `WAYPOINT_Z` | -190 | Clear hangar-entry point Z |
-| `UNLOAD_X` | 303 | Intake chute/charger X |
-| `UNLOAD_Z` | -228 | Intake chute/charger Z |
+| `WAYPOINT_X` | 282 | Clear hangar-entry point X |
+| `WAYPOINT_Z` | -221 | Clear hangar-entry point Z |
+| `UNLOAD_X` | 302 | Intake chute/charger X |
+| `UNLOAD_Z` | -221 | Intake chute/charger Z |
 | `LOW_BATT` | 0.5 | Charge ratio that triggers return |
 | `READY_BATT` | 0.7 | Charge ratio required before release |
 
-The waypoint `(303, -190)` is aligned with the intake chute at `(303, -228)`.
-Confirm that it is outside the hangar and that the straight 38-meter Z approach
-is unobstructed before running unattended. Navigation uses an X/Z
-Manhattan-distance tolerance of 2. More than 20 consecutive updates below
-velocity 0.2 trigger Mode 5 for ten seconds.
+The waypoint `(282, -221)` is aligned with the intake chute at `(302, -221)`.
+Confirm that it is outside the hangar and that the straight 20-meter eastbound
+X approach is unobstructed before running unattended. Navigation uses an X/Z
+target and waits for AIMeE to leave Mode 2 naturally before starting the next
+operation. More than 20 consecutive updates below velocity 0.2 trigger Mode 5
+for ten seconds.
 
 Supervisor defaults:
 
@@ -145,6 +151,7 @@ Supervisor defaults:
 | `WEATHER` | 1997212478 | `StructureWeatherStation` prefab hash |
 | `HANGAR` | -566348148 | `StructureMediumHangerDoor` prefab hash |
 | `SWITCH` | 1220484876 | `StructureLogicSwitch` Lever prefab hash |
+| `BUTTON` | 491845673 | `StructureLogicButton` prefab hash |
 | `LED` | -815193061 | `StructureConsoleLED5` small LED display hash |
 
 The named hangar write affects every Medium Hangar Door named `AIMeE Hangar`
@@ -211,10 +218,18 @@ For manual shutdown, raise `AIMeE Recall` and leave it raised. The bot returns,
 unloads, charges, the door closes, and the system remains parked. Lowering the
 lever reopens the door and resumes the unacknowledged target.
 
+Pressing `AIMeE Reset` writes recall before clearing the job memory. The
+supervisor keeps the hangar open until AIMeE returns, unloads, charges, and
+reports parked. When weather and the recall lever are safe, it restarts the
+spiral at the first target. The reset button also clears a latched command-2
+completion. Multiple named reset buttons are supported; any press requests the
+same reset sequence.
+
 At `MAX_RANGE`, the coordinator writes command 2. After parking, the supervisor
-closes the hangar and all three programs hold. To reset without reloading chips,
-set the job memory to 0 first, then set command memory to 0. The supervisor
-performs another safe recall cycle and the coordinator starts at the first ring.
+closes the hangar and all three programs hold. Press `AIMeE Reset` for the safe
+reset sequence. Without a reset button, set the job memory to 0 first, then set
+command memory to 0; the supervisor performs another safe recall cycle and the
+coordinator starts at the first ring.
 
 ## Mining and recovery
 
@@ -224,7 +239,8 @@ Mode 6 or low battery returns through the waypoint, unloads, charges, and resume
 the same target. An error selects Mode 0; after the error clears the miner
 attempts the return route.
 
-Ordinary navigation checks command, battery, error, X/Z arrival, and velocity.
+Ordinary navigation checks command, battery, error, Mode-2 completion, and
+velocity.
 Return navigation suppresses command and battery checks so recall cannot recurse,
 but still checks device errors. Mode-5 recovery sleeps for ten seconds before
 retrying Mode 2.
@@ -249,9 +265,9 @@ Coordinator: `r0` is command/job scratch, `r1` is the signed job index,
 relative coordinates, and `r11`/`r12` are world coordinates.
 
 Miner: `r0` is mode/error/command scratch, `r2`/`r3` are the route target,
-`r4` is mineable/Y scratch, `r5`/`r6` calculate distance, `r7` is the stuck
-counter, `r8` is the job index, `r10` distinguishes outbound from return,
-`r15` is charge ratio, and `ra` holds the navigation return address.
+`r4` is mineable/Y scratch, `r7` is the stuck counter, `r8` is the job index,
+`r10` distinguishes outbound from return, `r15` is charge ratio, and `ra` holds
+the navigation return address.
 
 Supervisor: `r0` is device/display data and the danger result, `r1` is the NaN
 test, and `ra` is used by the non-nested `danger` and `displays` calls.
@@ -262,7 +278,7 @@ test, and `ra` is used by the non-nested `danger` and `displays` calls.
 - The ten-second Mode-5 sleep delays a new recall until the sleep finishes.
 - Skipping out-of-range or excluded points performs one skip per tick, so safety
   response is handled by the independent supervisor rather than the coordinator.
-- Position tolerance and AIMeE mode transitions still depend on terrain and the
+- AIMeE's Mode-2-to-0 completion transition still depends on terrain and the
   current game runtime.
 - Mode-4 completion is the unload postcondition; individual ore slots are not
   inspected.
@@ -277,8 +293,9 @@ test, and `ra` is used by the non-nested `danger` and `displays` calls.
 ## Simulator scenarios
 
 Sibling scenarios cover first/next target publication, exclusion-zone skipping,
-command holds, range completion, mining continuation, target acknowledgement,
-miner recall, safe supervisor startup, manual and weather recall with post-park
-door closure, named display output, and completion hold. The emulator does not
-move, mine, unload, charge, or advance weather autonomously, so those
-transitions still require in-game testing.
+command holds, range completion, Mode-2 completion waits, mining continuation,
+target acknowledgement, miner recall, safe supervisor startup, manual and
+weather recall with post-park door closure, reset from latched completion, named
+display output, and completion hold. The emulator does not move, mine, unload,
+charge, or advance weather autonomously, so those transitions still require
+in-game testing.

@@ -1,30 +1,38 @@
 {
   "version": 1,
   "script": "supervisor.ic10",
-  "steps": 120,
+  "steps": 500,
   "devices": [
     { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 187 } },
     { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": -10200 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 2 } },
-    { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 1 } },
+    { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 0 } },
     {
       "id": 25,
       "prefab": "Robot",
       "pin": "d5",
       "virtual": true,
-      "props": { "PositionX": 302, "PositionZ": -221, "Mode": 0 },
+      "props": { "PositionX": 302, "PositionZ": -221, "Mode": 2 },
       "slots": [{ "index": 0, "item": "ItemBatteryCellLarge" }]
     },
     { "id": 26, "prefab": "StructureLogicSwitch", "name": "AIMeE Recall", "props": { "Open": 0 } },
     { "id": 27, "prefab": "StructureWeatherStation", "props": { "Mode": 0, "NextWeatherEventTime": 1000 } },
-    { "id": 28, "prefab": "StructureMediumHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 1 } }
+    { "id": 28, "prefab": "StructureMediumHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 0 } },
+    { "id": 29, "prefab": "StructureLogicButton", "name": "AIMeE Reset", "props": { "Setting": 0 } }
+  ],
+  "changes": [
+    { "afterStep": 60, "devices": { "29": { "Setting": 1 } } },
+    { "afterStep": 130, "devices": { "29": { "Setting": 0 } } },
+    { "afterStep": 250, "devices": { "24": { "Setting": 1 }, "25": { "Mode": 0 } } }
   ],
   "expect": {
     "devices": {
-      "23": { "Setting": 2 },
+      "22": { "Setting": 0 },
+      "23": { "Setting": 0 },
       "24": { "Setting": 1 },
-      "28": { "Open": 0 }
+      "28": { "Open": 1 },
+      "29": { "Setting": 0 }
     }
   }
 }
