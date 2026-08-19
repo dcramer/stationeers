@@ -44,6 +44,8 @@ References and conventions:
   modes, recovery paths, stack discipline, and review checklist.
 - [Prefab hash catalog](docs/prefab-hashes.md) — every prefab name and signed
   hash in the pinned Stationpedia game-data version.
+- [Pipe color map](docs/pipe-color-map.md) — gas, liquid, mixture, and service
+  conventions using the standard and metallic spray-paint palettes.
 - [Script conventions](scripts/README.md) — directory layout and README
   template.
 - [Agent guidance](AGENTS.md) — repository-specific editing and validation
