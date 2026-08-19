@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "script": "room-controller.ic10",
+  "steps": 40,
+  "devices": [
+    { "id": 20, "prefab": "StructureOccupancySensor", "name": "Room", "props": { "Activate": 1 } },
+    { "id": 21, "prefab": "StructureLightLong", "name": "Room", "props": { "On": 0 } },
+    { "id": 22, "prefab": "StructureLightLongAngled", "name": "Room", "props": { "On": 0 } },
+    { "id": 23, "prefab": "StructureLightLongWide", "name": "Room", "props": { "On": 0 } },
+    { "id": 24, "prefab": "StructureLightRound", "name": "Room", "props": { "On": 0 } },
+    { "id": 25, "prefab": "StructureLightRoundAngled", "name": "Room", "props": { "On": 0 } },
+    { "id": 26, "prefab": "StructureLightRoundSmall", "name": "Room", "props": { "On": 0 } },
+    { "id": 27, "prefab": "StructureWallLight", "name": "Room", "props": { "On": 0 } },
+    { "id": 28, "prefab": "StructureWallLightBattery", "name": "Room", "props": { "On": 0 } },
+    { "id": 29, "prefab": "StructureLightLong", "name": "Other Room", "props": { "On": 0 } },
+    { "id": 30, "prefab": "StructureLogicSwitch", "name": "Lights", "props": { "Open": 1 } }
+  ],
+  "expect": {
+    "devices": {
+      "21": { "On": 1 },
+      "22": { "On": 1 },
+      "23": { "On": 1 },
+      "24": { "On": 1 },
+      "25": { "On": 1 },
+      "26": { "On": 1 },
+      "27": { "On": 1 },
+      "28": { "On": 1 },
+      "29": { "On": 0 }
+    }
+  }
+}

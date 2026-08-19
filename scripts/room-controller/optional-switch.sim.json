@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "script": "room-controller.ic10",
+  "steps": 50,
+  "devices": [
+    { "id": 20, "prefab": "StructureOccupancySensor", "name": "Room", "props": { "Activate": 1 } },
+    { "id": 21, "prefab": "StructureLightLong", "name": "Room", "props": { "On": 0 } }
+  ],
+  "expect": {
+    "devices": {
+      "21": { "On": 1 }
+    }
+  }
+}
