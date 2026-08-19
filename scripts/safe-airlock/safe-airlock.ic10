@@ -1,0 +1,127 @@
+define INNER_PRESSURE 100
+define OUTER_PRESSURE 0
+define VACUUM_PRESSURE 0.1
+define PRESSURE_TOLERANCE 1
+define WAIT_LIMIT 600
+alias innerDoor d0
+alias outerDoor d1
+alias innerVent d2
+alias outerVent d3
+alias sensor d4
+alias waitCount r0
+alias value r1
+alias target r2
+alias side r3
+bdns innerDoor configFault
+bdns outerDoor configFault
+bdns innerVent configFault
+bdns outerVent configFault
+bdns sensor configFault
+s innerVent On 0
+s outerVent On 0
+s innerDoor Mode 1
+s outerDoor Mode 1
+move r4 3
+move r5 2
+move r6 0
+move r7 1
+move target INNER_PRESSURE
+move side 0
+j cycle
+configFault:
+s db Setting -2
+yield
+j configFault
+cycle:
+s db Setting 2
+jal seal
+s dr4 Mode 1
+s dr4 PressureExternal VACUUM_PRESSURE
+s dr4 On 1
+jal waitVacuum
+s dr4 On 0
+ble target VACUUM_PRESSURE openDestination
+s dr5 Mode 0
+s dr5 PressureExternal target
+s dr5 On 1
+sub r8 target PRESSURE_TOLERANCE
+jal waitPressure
+s dr5 On 0
+openDestination:
+s innerVent On 0
+s outerVent On 0
+s dr6 Open 1
+move waitCount 0
+waitOpen:
+yield
+l value dr6 Open
+bnez value idle
+add waitCount waitCount 1
+bge waitCount WAIT_LIMIT fault
+j waitOpen
+idle:
+s db Setting side
+s dr6 Setting 1
+s dr7 Setting 0
+s innerDoor Lock 0
+s outerDoor Lock 0
+idleWait:
+yield
+l r8 dr7 Setting
+l value dr7 Open
+bne r8 value requested
+j idleWait
+requested:
+move r8 r4
+move r4 r5
+move r5 r8
+move r8 r6
+move r6 r7
+move r7 r8
+seqz side side
+select target side OUTER_PRESSURE INNER_PRESSURE
+j cycle
+seal:
+s innerDoor Lock 1
+s outerDoor Lock 1
+s innerDoor Open 0
+s outerDoor Open 0
+move waitCount 0
+sealWait:
+yield
+l value innerDoor Open
+l r8 outerDoor Open
+or value value r8
+beqz value ra
+add waitCount waitCount 1
+bge waitCount WAIT_LIMIT fault
+j sealWait
+waitVacuum:
+move waitCount 0
+vacuumWait:
+yield
+l value sensor Pressure
+ble value VACUUM_PRESSURE ra
+add waitCount waitCount 1
+bge waitCount WAIT_LIMIT fault
+j vacuumWait
+waitPressure:
+move waitCount 0
+pressureWait:
+yield
+l value sensor Pressure
+bge value r8 ra
+add waitCount waitCount 1
+bge waitCount WAIT_LIMIT fault
+j pressureWait
+fault:
+s innerVent On 0
+s outerVent On 0
+s innerDoor Open 0
+s outerDoor Open 0
+s innerDoor Lock 1
+s outerDoor Lock 1
+s db Setting -1
+faultWait:
+yield
+j faultWait
