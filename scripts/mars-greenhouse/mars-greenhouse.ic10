@@ -1,0 +1,95 @@
+define FILL_START_PRESSURE 65
+define FILL_TARGET_PRESSURE 75
+define HIGH_PRESSURE 100
+define VENT_TARGET_PRESSURE 90
+define MIN_CO2_RATIO 0.05
+define CO2_FILL_PRESSURE 90
+define CO2_PURGE_PRESSURE 75
+define COOL_START_TEMP 305.15
+define MIN_CO2_REFRESH_TEMP 288.15
+define MAX_PIPE_PRESSURE 5000
+alias sensor d0
+alias growLight d1
+alias vent d2
+alias daylight d3
+alias pressure r0
+alias co2Ratio r1
+alias temperature r2
+alias work r3
+start:
+move sp 0
+jal safeOff
+bdns sensor fault
+bdns growLight fault
+bdns vent fault
+bdns daylight fault
+s vent Lock 1
+main:
+bdns sensor fault
+bdns growLight fault
+bdns vent fault
+bdns daylight fault
+l pressure sensor Pressure
+bnan pressure fault
+l work sensor Combustion
+bnez work fault
+s db Setting pressure
+l work daylight Activate
+s growLight On work
+bgt pressure HIGH_PRESSURE ventHigh
+blt pressure FILL_START_PRESSURE fillLow
+l temperature sensor Temperature
+bnan temperature fault
+bgt temperature COOL_START_TEMP refreshAir
+l co2Ratio sensor RatioCarbonDioxide
+bnan co2Ratio fault
+blt temperature MIN_CO2_REFRESH_TEMP ventOff
+blt co2Ratio MIN_CO2_RATIO refreshAir
+j ventOff
+fillLow:
+s vent On 0
+s vent Mode 0
+s vent PressureExternal FILL_TARGET_PRESSURE
+s vent PressureInternal 0
+s vent On 1
+j wait
+ventHigh:
+s vent On 0
+s vent Mode 1
+s vent PressureExternal VENT_TARGET_PRESSURE
+s vent PressureInternal MAX_PIPE_PRESSURE
+s vent On 1
+j wait
+refreshAir:
+bge pressure CO2_FILL_PRESSURE purgeCO2
+s vent On 0
+s vent Mode 0
+s vent PressureExternal CO2_FILL_PRESSURE
+s vent PressureInternal 0
+s vent On 1
+j wait
+purgeCO2:
+s vent On 0
+s vent Mode 1
+s vent PressureExternal CO2_PURGE_PRESSURE
+s vent PressureInternal MAX_PIPE_PRESSURE
+s vent On 1
+j wait
+ventOff:
+s vent On 0
+wait:
+yield
+j main
+fault:
+jal safeOff
+s db Setting -1
+yield
+j start
+safeOff:
+bdns growLight noLightOff
+s growLight On 0
+noLightOff:
+bdns vent safeOffDone
+s vent On 0
+safeOffDone:
+j ra

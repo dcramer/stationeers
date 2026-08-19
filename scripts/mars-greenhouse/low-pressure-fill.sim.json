@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "script": "mars-greenhouse.ic10",
+  "steps": 150,
+  "devices": [
+    { "id": 20, "prefab": "StructureGasSensor", "pin": "d0", "props": { "Pressure": 50, "Temperature": 280, "RatioCarbonDioxide": 0.5, "Combustion": 0 } },
+    { "id": 21, "prefab": "StructureGrowLight", "pin": "d1", "props": { "On": 0 } },
+    { "id": 22, "prefab": "StructureActiveVent", "pin": "d2", "props": { "On": 0, "Mode": 1, "PressureExternal": 0, "PressureInternal": 5000, "Lock": 0 } },
+    { "id": 23, "prefab": "StructureDaylightSensor", "pin": "d3", "props": { "Activate": 1 } }
+  ],
+  "expect": {
+    "devices": {
+      "21": { "On": 1 },
+      "22": { "On": 1, "Mode": 0, "PressureExternal": 75, "PressureInternal": 0, "Lock": 1 }
+    }
+  }
+}
