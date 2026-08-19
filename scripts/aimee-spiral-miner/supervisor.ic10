@@ -6,21 +6,20 @@ alias status d4
 alias drone d5
 define STORMTIME 600
 define WEATHER 1997212478
-define HANGAR -566348148
+define HANGAR_SMALL 1736080881
+define HANGAR_MEDIUM -566348148
+define HANGAR_LARGE -1351081801
 define SWITCH 1220484876
 define BUTTON 491845673
 define LED -815193061
 define RECALL_NAME HASH("AIMeE Recall")
-define RESET_NAME HASH("AIMeE Reset")
 define HANGAR_NAME HASH("AIMeE Hangar")
 boot:
 l r0 command Setting
 beq r0 2 complete_wait
-sbn HANGAR HANGAR_NAME Open 1
-s command Setting 1
-j recall_wait
+j recall
 run:
-sbn HANGAR HANGAR_NAME Open 1
+jal doors_open
 s command Setting 0
 run_wait:
 yield
@@ -32,7 +31,7 @@ bnez r0 recall
 j run_wait
 recall:
 s command Setting 1
-sbn HANGAR HANGAR_NAME Open 1
+jal doors_open
 recall_wait:
 yield
 jal displays
@@ -40,7 +39,7 @@ l r0 command Setting
 beq r0 2 complete_wait
 l r0 status Setting
 bne r0 1 recall_wait
-sbn HANGAR HANGAR_NAME Open 0
+jal doors_close
 recall_hold:
 yield
 jal displays
@@ -51,14 +50,14 @@ bnez r0 recall_hold
 j run
 complete_wait:
 s command Setting 2
-sbn HANGAR HANGAR_NAME Open 1
+jal doors_open
 complete_return:
 yield
 jal displays
 l r0 status Setting
 bne r0 1 complete_return
 complete_parked:
-sbn HANGAR HANGAR_NAME Open 0
+jal doors_close
 complete_hold:
 yield
 jal displays
@@ -68,8 +67,17 @@ j boot
 reset:
 s command Setting 1
 s job Setting 0
-sbn HANGAR HANGAR_NAME Open 1
-j recall_wait
+j recall
+doors_open:
+sbn HANGAR_SMALL HANGAR_NAME Open 1
+sbn HANGAR_MEDIUM HANGAR_NAME Open 1
+sbn HANGAR_LARGE HANGAR_NAME Open 1
+j ra
+doors_close:
+sbn HANGAR_SMALL HANGAR_NAME Open 0
+sbn HANGAR_MEDIUM HANGAR_NAME Open 0
+sbn HANGAR_LARGE HANGAR_NAME Open 0
+j ra
 danger:
 lbn r0 SWITCH RECALL_NAME Open Average
 snan r1 r0
@@ -89,18 +97,12 @@ dangerous:
 move r0 1
 j ra
 displays:
-lbn r0 BUTTON RESET_NAME Setting Maximum
+lbn r0 BUTTON HASH("AIMeE Reset") Setting Maximum
 bgtz r0 reset
 sbn LED HASH("AIMeE X") Mode 0
 sbn LED HASH("AIMeE Z") Mode 0
 sbn LED HASH("AIMeE Mode") Mode 0
 sbn LED HASH("AIMeE Charge") Mode 0
-sbn LED HASH("AIMeE Target X") Mode 0
-sbn LED HASH("AIMeE Target Z") Mode 0
-sbn LED HASH("AIMeE Job") Mode 0
-sbn LED HASH("AIMeE Command") Mode 0
-sbn LED HASH("AIMeE Status") Mode 0
-sbn LED HASH("AIMeE Storm ETA") Mode 0
 l r0 drone PositionX
 sbn LED HASH("AIMeE X") Setting r0
 l r0 drone PositionZ

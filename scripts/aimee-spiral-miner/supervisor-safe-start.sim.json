@@ -18,10 +18,12 @@
     },
     { "id": 26, "prefab": "StructureLogicSwitch", "name": "AIMeE Recall", "props": { "Open": 0 } },
     { "id": 27, "prefab": "StructureWeatherStation", "props": { "Mode": 0, "NextWeatherEventTime": 1000 } },
-    { "id": 28, "prefab": "StructureMediumHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 0 } },
+    { "id": 28, "prefab": "StructureAirlockGate", "name": "AIMeE Hangar", "props": { "Open": 0 } },
     { "id": 29, "prefab": "StructureConsoleLED5", "name": "AIMeE X", "props": { "Setting": 0 } },
     { "id": 30, "prefab": "StructureConsoleLED5", "name": "AIMeE Charge", "props": { "Setting": 0, "Mode": 2 } },
-    { "id": 31, "prefab": "StructureConsoleLED5", "name": "AIMeE Mode", "props": { "Setting": 9, "Mode": 2 } }
+    { "id": 31, "prefab": "StructureConsoleLED5", "name": "AIMeE Mode", "props": { "Setting": 9, "Mode": 2 } },
+    { "id": 32, "prefab": "StructureMediumHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 1 } },
+    { "id": 33, "prefab": "StructureLargeHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 0 } }
   ],
   "changes": [
     { "afterStep": 0, "slots": { "25": { "0": { "ChargeRatio": 0.75 } } } }
@@ -32,7 +34,9 @@
       "28": { "Open": 1 },
       "29": { "Setting": 302 },
       "30": { "Setting": 75, "Mode": 0 },
-      "31": { "Setting": 0, "Mode": 0 }
+      "31": { "Setting": 0, "Mode": 0 },
+      "32": { "Open": 1 },
+      "33": { "Open": 1 }
     }
   }
 }

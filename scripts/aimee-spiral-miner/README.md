@@ -30,7 +30,7 @@ supervisor never advances the spiral, and only the miner writes parked status.
 - 1 powered Weather Station
 - 1 Lever named exactly `AIMeE Recall`
 - 1 optional Logic Button named exactly `AIMeE Reset`
-- 1 Medium Hangar Door named exactly `AIMeE Hangar`
+- 3 Hangar Doors of any size named exactly `AIMeE Hangar`
 - 5 Logic Memory devices shared by all three housings
 - An unloading chute or bin and a charger at the unload position
 - Optional small LED displays listed below
@@ -81,7 +81,8 @@ AIMeE recalled.
 5. For push-button reset, name a Logic Button exactly `AIMeE Reset`. It is
    discovered by type and name and is not assigned to an IC pin. A missing
    reset button is harmless.
-6. Name every controlled Medium Hangar Door section exactly `AIMeE Hangar`.
+6. Name every controlled Small, Medium, or Large Hangar Door section exactly
+   `AIMeE Hangar`.
    Hangar sections are discovered by type and name and are not assigned to pins.
 7. Leave the Weather Station name unchanged; it is discovered by prefab type
    and is not assigned to a pin. Keep it powered and on the shared network.
@@ -149,14 +150,17 @@ Supervisor defaults:
 |---|---:|---|
 | `STORMTIME` | 600 | Recall when a Mode-1 forecast is closer than this many seconds |
 | `WEATHER` | 1997212478 | `StructureWeatherStation` prefab hash |
-| `HANGAR` | -566348148 | `StructureMediumHangerDoor` prefab hash |
+| `HANGAR_SMALL` | 1736080881 | `StructureAirlockGate` Small Hangar Door prefab hash |
+| `HANGAR_MEDIUM` | -566348148 | `StructureMediumHangerDoor` prefab hash |
+| `HANGAR_LARGE` | -1351081801 | `StructureLargeHangerDoor` prefab hash |
 | `SWITCH` | 1220484876 | `StructureLogicSwitch` Lever prefab hash |
 | `BUTTON` | 491845673 | `StructureLogicButton` prefab hash |
 | `LED` | -815193061 | `StructureConsoleLED5` small LED display hash |
 
-The named hangar write affects every Medium Hangar Door named `AIMeE Hangar`
-on the supervisor's output network. Name each section that must move together;
-do not reuse that name on unrelated doors.
+The named hangar routines affect every Small, Medium, and Large Hangar Door
+named `AIMeE Hangar` on the supervisor's output network. Each size needs its own
+prefab batch write, but each write scales to any number of matching doors. Name
+each section that must move together; do not reuse that name on unrelated doors.
 
 ## Optional displays
 
@@ -177,9 +181,9 @@ Missing displays are harmless.
 | `AIMeE Storm ETA` | Earliest connected Weather Station countdown |
 
 Names are case-sensitive because IC10 hashes the exact text. The supervisor
-forces every listed display to Normal mode (`Mode 0`) so numeric values do not
-gain stale unit suffixes such as `W`. It also changes the `AIMeE Mode` display's
-color to the current robot-mode value.
+forces the X, Z, Mode, and Charge displays to Normal mode (`Mode 0`); configure
+the other optional displays as Normal when installing them. It also changes the
+`AIMeE Mode` display's color to the current robot-mode value.
 
 ## Communication protocol
 

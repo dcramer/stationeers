@@ -18,8 +18,10 @@
     },
     { "id": 26, "prefab": "StructureLogicSwitch", "name": "AIMeE Recall", "props": { "Open": 0 } },
     { "id": 27, "prefab": "StructureWeatherStation", "props": { "Mode": 0, "NextWeatherEventTime": 1000 } },
-    { "id": 28, "prefab": "StructureMediumHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 0 } },
-    { "id": 29, "prefab": "StructureLogicButton", "name": "AIMeE Reset", "props": { "Setting": 0 } }
+    { "id": 28, "prefab": "StructureAirlockGate", "name": "AIMeE Hangar", "props": { "Open": 0 } },
+    { "id": 29, "prefab": "StructureLogicButton", "name": "AIMeE Reset", "props": { "Setting": 0 } },
+    { "id": 32, "prefab": "StructureMediumHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 1 } },
+    { "id": 33, "prefab": "StructureLargeHangerDoor", "name": "AIMeE Hangar", "props": { "Open": 0 } }
   ],
   "changes": [
     { "afterStep": 60, "devices": { "29": { "Setting": 1 } } },
@@ -32,7 +34,9 @@
       "23": { "Setting": 0 },
       "24": { "Setting": 1 },
       "28": { "Open": 1 },
-      "29": { "Setting": 0 }
+      "29": { "Setting": 0 },
+      "32": { "Open": 1 },
+      "33": { "Open": 1 }
     }
   }
 }
