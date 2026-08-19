@@ -11,7 +11,7 @@ define MAX_RANGE 120
 define USE_EXCLUSION 1
 define EXCLUDE_X_MIN 270
 define EXCLUDE_X_MAX 328
-define EXCLUDE_Z_MIN -364
+define EXCLUDE_Z_MIN -430
 define EXCLUDE_Z_MAX -214
 main:
 yield

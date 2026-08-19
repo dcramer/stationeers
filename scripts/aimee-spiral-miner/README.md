@@ -106,7 +106,7 @@ Coordinator defaults:
 | `USE_EXCLUSION` | 1 | Enables the rectangular exclusion zone |
 | `EXCLUDE_X_MIN` | 270 | Inclusive exclusion minimum X |
 | `EXCLUDE_X_MAX` | 328 | Inclusive exclusion maximum X |
-| `EXCLUDE_Z_MIN` | -364 | Inclusive exclusion minimum Z |
+| `EXCLUDE_Z_MIN` | -430 | Inclusive exclusion minimum Z, including the intended safety margin |
 | `EXCLUDE_Z_MAX` | -214 | Inclusive exclusion maximum Z |
 
 The exclusion rectangle is enabled. Any target whose world X and Z are both
@@ -114,8 +114,8 @@ inside the inclusive bounds is skipped. This filters mining targets only; it
 does not alter AIMeE's route between the mining field and hangar.
 
 The supplied exclusion bounds already include the intended AIMeE roaming
-margin. The coordinator therefore uses them directly and does not add another
-automatic margin.
+margin. In particular, the southern safety boundary is Z -430. The coordinator
+uses the bounds directly and does not add another automatic margin.
 
 The mining center `(162, -221)` lies 140 meters due west of the unload point
 `(302, -221)`. The waypoint `(282, -221)` is 20 meters west of unload, so the
