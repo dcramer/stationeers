@@ -1,0 +1,71 @@
+alias genGrid d0
+alias loadGrid d1
+alias genPeak d2
+alias genAvg d3
+alias loadPeak d4
+alias loadAvg d5
+alias genSample r0
+alias loadSample r1
+alias peakGen r2
+alias peakLoad r3
+alias averageGen r4
+alias averageLoad r5
+alias sampleCount r6
+alias resetValue r7
+alias scratch r8
+define BUTTON 491845673
+define RESET_NAME HASH("Power Stats Reset")
+boot:
+s genPeak Mode 2
+s genAvg Mode 2
+s loadPeak Mode 2
+s loadAvg Mode 2
+reset:
+move peakGen 0
+move peakLoad 0
+move averageGen 0
+move averageLoad 0
+move sampleCount 0
+s genPeak Setting 0
+s genAvg Setting 0
+s loadPeak Setting 0
+s loadAvg Setting 0
+resetWait:
+yield
+lbn resetValue BUTTON RESET_NAME Setting Maximum
+bgtz resetValue resetWait
+sample:
+lbn resetValue BUTTON RESET_NAME Setting Maximum
+bgtz resetValue reset
+bdns genGrid fault
+bdns loadGrid fault
+l genSample genGrid PowerPotential
+l loadSample loadGrid PowerActual
+snan scratch genSample
+bnez scratch fault
+snan scratch loadSample
+bnez scratch fault
+bltz genSample fault
+bltz loadSample fault
+max peakGen peakGen genSample
+max peakLoad peakLoad loadSample
+add sampleCount sampleCount 1
+sub scratch genSample averageGen
+div scratch scratch sampleCount
+add averageGen averageGen scratch
+sub scratch loadSample averageLoad
+div scratch scratch sampleCount
+add averageLoad averageLoad scratch
+s genPeak Setting peakGen
+s genAvg Setting averageGen
+s loadPeak Setting peakLoad
+s loadAvg Setting averageLoad
+yield
+j sample
+fault:
+s genPeak Setting -1
+s genAvg Setting -1
+s loadPeak Setting -1
+s loadAvg Setting -1
+yield
+j sample

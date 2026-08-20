@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "script": "power-readout.ic10",
+  "steps": 115,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "StructureCableAnalysizer",
+      "pin": "d0",
+      "props": { "PowerPotential": 4000, "PowerActual": 3000, "PowerRequired": 3000 }
+    },
+    {
+      "id": 21,
+      "prefab": "StructureCableAnalysizer",
+      "pin": "d1",
+      "props": { "PowerPotential": 50000, "PowerActual": 1200, "PowerRequired": 1200 }
+    },
+    { "id": 22, "prefab": "StructureConsoleLED5", "pin": "d2", "props": { "Mode": 0, "Setting": 0 } },
+    { "id": 23, "prefab": "StructureConsoleLED5", "pin": "d3", "props": { "Mode": 0, "Setting": 0 } },
+    { "id": 24, "prefab": "StructureConsoleLED5", "pin": "d4", "props": { "Mode": 0, "Setting": 0 } },
+    { "id": 25, "prefab": "StructureConsoleLED5", "pin": "d5", "props": { "Mode": 0, "Setting": 0 } },
+    { "id": 26, "prefab": "StructureLogicButton", "name": "Power Stats Reset", "props": { "Setting": 0 } }
+  ],
+  "changes": [
+    {
+      "afterStep": 63,
+      "devices": {
+        "20": { "PowerPotential": 7000 },
+        "21": { "PowerActual": 3000, "PowerRequired": 3000 },
+        "26": { "Setting": 1 }
+      }
+    },
+    { "afterStep": 81, "devices": { "26": { "Setting": 0 } } }
+  ],
+  "expect": {
+    "registers": {
+      "r2": 7000,
+      "r3": 3000,
+      "r4": 7000,
+      "r5": 3000,
+      "r6": 1
+    },
+    "devices": {
+      "22": { "Mode": 2, "Setting": 7000 },
+      "23": { "Mode": 2, "Setting": 7000 },
+      "24": { "Mode": 2, "Setting": 3000 },
+      "25": { "Mode": 2, "Setting": 3000 }
+    }
+  }
+}
