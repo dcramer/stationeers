@@ -1,0 +1,80 @@
+# Hardsuit visor safety and life-support control.
+# Adapted from Oberon187's Hardsuit Safety Script.
+alias suit db
+alias helmet d0
+define MIN_TEMP 273.15
+define MAX_TEMP 313.15
+define MIN_PRESSURE 35
+define MAX_PRESSURE 125
+define MIN_OXYGEN 0.15
+define MAX_TOXINS 0.02
+alias unsafe r0
+alias value r1
+alias toxins r2
+alias hasHelmet r3
+alias visorOpen r4
+alias lifeOn r5
+alias lastLife r6
+alias lastAlert r7
+move lastLife -1
+move lastAlert -1
+start:
+yield
+sdse hasHelmet helmet
+beqz hasHelmet start
+move unsafe 0
+l visorOpen helmet Open
+# Suit pressure and temperature are reliable external readings.
+l value suit PressureExternal
+slt value value MIN_PRESSURE
+or unsafe unsafe value
+l value suit PressureExternal
+sgt value value MAX_PRESSURE
+or unsafe unsafe value
+l value suit TemperatureExternal
+sgt value value MAX_TEMP
+or unsafe unsafe value
+l value suit TemperatureExternal
+slt value value MIN_TEMP
+or unsafe unsafe value
+# Helmet gas ratios are supplemental because they lag while open.
+l toxins helmet RatioCarbonDioxide
+l value helmet RatioMethane
+add toxins toxins value
+l value helmet RatioPollutant
+add toxins toxins value
+l value helmet RatioNitrousOxide
+add toxins toxins value
+l value helmet RatioHydrazine
+add toxins toxins value
+l value helmet RatioSilanol
+add toxins toxins value
+l value helmet RatioHydrochloricAcid
+add toxins toxins value
+sgt value toxins MAX_TOXINS
+or unsafe unsafe value
+l value helmet RatioOxygen
+slt value value MIN_OXYGEN
+or unsafe unsafe value
+# Alert, close, and lock only when the safety state changes.
+beq unsafe lastAlert lifeSupport
+move lastAlert unsafe
+beqz unsafe clearAlert
+s suit Error 1
+beqz visorOpen lockHelmet
+s helmet Open 0
+lockHelmet:
+s helmet Lock 1
+j lifeSupport
+clearAlert:
+s suit Error 0
+s helmet Lock 0
+lifeSupport:
+l visorOpen helmet Open
+seqz lifeOn visorOpen
+beq lifeOn lastLife start
+move lastLife lifeOn
+s suit Filtration lifeOn
+s suit On lifeOn
+s suit AirRelease lifeOn
+j start

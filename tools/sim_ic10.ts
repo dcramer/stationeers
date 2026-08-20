@@ -59,6 +59,7 @@ type Scenario = {
   version: 1;
   script: string;
   housingId?: number;
+  housingPrefab?: string;
   steps: number;
   devices?: SimpleDevice[];
   environment?: ScenarioEnvironment;
@@ -206,7 +207,11 @@ function checkExpectedNumber(label: string, actual: number | undefined, expected
   return `${label}: expected ${value}${tolerance ? ` ± ${tolerance}` : ""}, got ${actual}`;
 }
 
-function createSimpleEnvironment(devices: SimpleDevice[], housingId: number): ScenarioEnvironment {
+function createSimpleEnvironment(
+  devices: SimpleDevice[],
+  housingId: number,
+  housingPrefab: string,
+): ScenarioEnvironment {
   const chipId = 1;
   return {
     version: 1,
@@ -214,12 +219,14 @@ function createSimpleEnvironment(devices: SimpleDevice[], housingId: number): Sc
     devices: [
       {
         id: housingId,
-        PrefabName: "StructureCircuitHousing",
+        PrefabName: housingPrefab,
         chip: chipId,
         pins: devices
           .filter((device) => device.pin && !device.virtual)
           .map((device) => ({ pin: device.pin, device: device.id })),
-        ports: [{ port: "default", network: "base" }],
+        ports: housingPrefab === "ItemHardSuit"
+          ? undefined
+          : [{ port: "default", network: "base" }],
       },
       ...devices.map((device) => ({
         id: device.id,
@@ -252,6 +259,23 @@ function connectVirtualPins(builder: Builer, housingId: number, devices: SimpleD
   }
 }
 
+function connectWearableHousingNetwork(
+  builder: Builer,
+  housingId: number,
+  housingPrefab: string | undefined,
+): void {
+  if (housingPrefab !== "ItemHardSuit") return;
+
+  const housing = builder.Devices.get(housingId);
+  const network = builder.Networks.get("base");
+  if (!housing || !network) throw new Error("hardsuit scenario is missing its base network");
+
+  // Wearable housings have no physical data port, but the emulator's IC
+  // context still expects every housing to expose a network for db access.
+  network.devices.add(housing);
+  housing.ports.getNetwork = () => network;
+}
+
 function scenarioEnvironment(scenario: Scenario): { environment: ScenarioEnvironment; housingId: number } {
   const housingId = scenario.housingId ?? 10;
   if (scenario.environment && scenario.devices) {
@@ -264,7 +288,11 @@ function scenarioEnvironment(scenario: Scenario): { environment: ScenarioEnviron
       if (ids.has(device.id)) throw new Error(`duplicate device or housing id: ${device.id}`);
       ids.add(device.id);
     }
-    return { environment: createSimpleEnvironment(scenario.devices, housingId), housingId };
+    const housingPrefab = scenario.housingPrefab ?? "StructureCircuitHousing";
+    return {
+      environment: createSimpleEnvironment(scenario.devices, housingId, housingPrefab),
+      housingId,
+    };
   }
   throw new Error("scenario must define devices or environment");
 }
@@ -335,7 +363,10 @@ export async function runScenario(scenarioFile: string): Promise<ScenarioResult>
   injectScript(environment, housingId, await readFile(scriptPath, "utf8"));
 
   const builder = Builer.from(JSON.stringify(environment));
-  if (scenario.devices) connectVirtualPins(builder, housingId, scenario.devices);
+  if (scenario.devices) {
+    connectWearableHousingNetwork(builder, housingId, scenario.housingPrefab);
+    connectVirtualPins(builder, housingId, scenario.devices);
+  }
   const runner = builder.Runners.get(housingId);
   if (!runner) throw new Error(`emulator did not create runner for housing ${housingId}`);
 

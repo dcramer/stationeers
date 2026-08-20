@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "script": "hardsuit-safety.ic10",
+  "housingId": 10,
+  "housingPrefab": "ItemHardSuit",
+  "steps": 480,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "ItemHardsuitHelmet",
+      "pin": "d0",
+      "virtual": true,
+      "props": {
+        "Open": 1,
+        "Lock": 0,
+        "RatioOxygen": 0.21,
+        "RatioCarbonDioxide": 0,
+        "RatioMethane": 0,
+        "RatioPollutant": 0,
+        "RatioNitrousOxide": 0,
+        "RatioHydrazine": 0,
+        "RatioSilanol": 0,
+        "RatioHydrochloricAcid": 0
+      }
+    }
+  ],
+  "changes": [
+    {
+      "afterStep": 0,
+      "devices": {
+        "10": { "PressureExternal": 0, "TemperatureExternal": 293.15 }
+      }
+    },
+    { "afterStep": 180, "devices": { "10": { "PressureExternal": 100 } } }
+  ],
+  "expect": {
+    "devices": {
+      "10": { "Error": 0, "Filtration": 1, "On": 1, "AirRelease": 1 },
+      "20": { "Open": 0, "Lock": 0 }
+    }
+  }
+}

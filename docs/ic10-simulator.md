@@ -113,6 +113,11 @@ by named batch instructions, `props` supplies initial logic values, and `slots`
 can install items such as a battery. Device IDs must be unique; the default
 housing ID is `10`.
 
+Compact scenarios use a `StructureCircuitHousing` by default. Set
+`housingPrefab` when the chip runs in another supported housing. For example,
+use `"housingPrefab": "ItemHardSuit"` for a suit IC and make its helmet pin
+virtual because wearable items do not have a wired data port in the emulator.
+
 Set `virtual` with a `pin` for a remotely referenced device that is not on the
 IC data network. The AIMeE scenarios use this to represent the Logic
 Transmitter link without inventing a wired Robot port:
