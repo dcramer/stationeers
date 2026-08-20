@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "script": "filtration-manifold.ic10",
+  "steps": 304,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "StructureVolumePump",
+      "pin": "d0",
+      "props": { "On": 1, "Lock": 0 }
+    },
+    {
+      "id": 21,
+      "prefab": "StructurePipeAnalysizer",
+      "pin": "d1",
+      "props": {
+        "On": 1,
+        "Power": 1,
+        "Error": 0,
+        "Pressure": 55000,
+        "TotalMoles": 100,
+        "Lock": 0
+      }
+    },
+    {
+      "id": 26,
+      "prefab": "StructureBackPressureRegulator",
+      "pin": "d2",
+      "props": { "On": 0, "Lock": 0, "Setting": 0 }
+    }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "On": 0, "Lock": 1 },
+      "21": { "On": 1, "Lock": 1 },
+      "26": { "On": 1, "Lock": 1, "Setting": 50000 }
+    }
+  }
+}

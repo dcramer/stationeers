@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "script": "filtration-manifold.ic10",
+  "steps": 300,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "StructureVolumePump",
+      "pin": "d0",
+      "props": { "On": 0, "Lock": 0 }
+    },
+    {
+      "id": 21,
+      "prefab": "StructurePipeAnalysizer",
+      "pin": "d1",
+      "props": {
+        "On": 1,
+        "Power": 1,
+        "Error": 0,
+        "Pressure": 30000,
+        "TotalMoles": 100,
+        "RatioNitrogen": 0.01,
+        "Lock": 0
+      }
+    },
+    {
+      "id": 26,
+      "prefab": "StructureBackPressureRegulator",
+      "pin": "d2",
+      "props": { "On": 0, "Lock": 0, "Setting": 0 }
+    },
+    {
+      "id": 22,
+      "prefab": "StructureFiltration",
+      "name": "Nitrogen",
+      "props": { "On": 0, "Mode": 0, "PressureOutput": 39000 },
+      "slots": [
+        { "index": 0, "item": "ItemGasFilterNitrogen", "amount": 100 },
+        { "index": 1, "item": "ItemGasFilterNitrogen", "amount": 100 }
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "afterStep": 100,
+      "devices": {
+        "21": { "RatioNitrogen": 0.001 },
+        "22": { "PressureOutput": 42000 }
+      },
+      "slots": {
+        "22": {
+          "0": { "Quantity": 100 },
+          "1": { "Quantity": 100 }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "On": 0 },
+      "22": { "On": 1, "Mode": 1 },
+      "26": { "On": 0 }
+    }
+  }
+}

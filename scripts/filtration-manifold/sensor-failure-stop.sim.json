@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "script": "filtration-manifold.ic10",
+  "steps": 100,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "StructureVolumePump",
+      "pin": "d0",
+      "props": { "On": 1, "Lock": 0 }
+    },
+    {
+      "id": 21,
+      "prefab": "StructurePipeAnalysizer",
+      "pin": "d1",
+      "props": { "On": 0, "Power": 0, "Error": 0, "Lock": 0 }
+    },
+    {
+      "id": 26,
+      "prefab": "StructureBackPressureRegulator",
+      "pin": "d2",
+      "props": { "On": 1, "Lock": 0, "Setting": 0 }
+    },
+    {
+      "id": 22,
+      "prefab": "StructureFiltration",
+      "name": "Nitrogen",
+      "props": { "On": 1, "Mode": 1 }
+    }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "On": 0 },
+      "21": { "On": 1 },
+      "22": { "On": 0, "Mode": 0 },
+      "26": { "On": 0 }
+    }
+  }
+}

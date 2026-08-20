@@ -30,6 +30,23 @@ game-ready, and easy to configure from an IC Housing.
 - `tests/` tests repository tooling and the simulation harness; neither
   reproduces the full game.
 
+## Design priority: power first
+
+- Treat minimizing continuous and idle power as the default design goal unless
+  the task explicitly prioritizes something else. Safety and reliable recovery
+  still take precedence over power savings.
+- Prefer hard-switching unused machines, pumps, sensors, regulators, and lit
+  indicators off. Use standby modes only when their persistent power cost is
+  justified by wake-up, monitoring, or safety requirements.
+- Count the control system itself when comparing designs. Favor one shared
+  sensor or controller over many always-on devices when it preserves the
+  required behavior.
+- Remember that an onboard IC stops executing when its host is hard-off and
+  cannot wake that host. Use an external controller when autonomous hard-off
+  and restart provide a meaningful net power saving.
+- Document unavoidable continuous loads, wake-up dependencies, retained-state
+  assumptions, and any power-versus-safety tradeoff in the script README.
+
 ## IC10 rules
 
 - Use the same lowercase kebab-case name for a standalone script directory and

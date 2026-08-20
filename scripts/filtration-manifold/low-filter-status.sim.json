@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "script": "filtration-manifold.ic10",
+  "steps": 300,
+  "devices": [
+    {
+      "id": 20,
+      "prefab": "StructureVolumePump",
+      "pin": "d0",
+      "props": { "On": 0, "Lock": 0 }
+    },
+    {
+      "id": 21,
+      "prefab": "StructurePipeAnalysizer",
+      "pin": "d1",
+      "props": {
+        "On": 1,
+        "Power": 1,
+        "Error": 0,
+        "Pressure": 5000,
+        "TotalMoles": 100,
+        "RatioNitrogen": 0,
+        "Lock": 0
+      }
+    },
+    {
+      "id": 26,
+      "prefab": "StructureBackPressureRegulator",
+      "pin": "d2",
+      "props": { "On": 0, "Lock": 0, "Setting": 0 }
+    },
+    {
+      "id": 22,
+      "prefab": "StructureFiltration",
+      "name": "Nitrogen",
+      "props": { "On": 0, "Mode": 0, "PressureOutput": 45000 },
+      "slots": [
+        { "index": 0, "item": "ItemGasFilterNitrogen", "amount": 20 },
+        { "index": 1, "item": "ItemGasFilterNitrogen", "amount": 20 }
+      ]
+    },
+    {
+      "id": 24,
+      "prefab": "StructureFlashingLight",
+      "name": "Nitrogen",
+      "props": { "On": 0 }
+    },
+    {
+      "id": 25,
+      "prefab": "StructureDiodeSlide",
+      "name": "Nitrogen",
+      "props": { "On": 1, "Setting": 0 }
+    }
+  ],
+  "changes": [
+    {
+      "afterStep": 0,
+      "devices": { "22": { "PressureOutput": 45000 } },
+      "slots": {
+        "22": {
+          "0": { "Quantity": 20 },
+          "1": { "Quantity": 20 }
+        }
+      }
+    }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "On": 0 },
+      "22": { "On": 0, "Mode": 0 },
+      "24": { "On": 1 },
+      "25": { "On": 0, "Setting": 0.2 },
+      "26": { "On": 0, "Lock": 1, "Setting": 50000 }
+    }
+  }
+}

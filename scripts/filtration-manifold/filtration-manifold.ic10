@@ -1,57 +1,126 @@
-define ANALYZER 435685051
+alias feed d0
+alias analyzer d1
+alias relief d2
+alias pressure r0
+alias status r1
+alias feedWanted r2
+alias runMask r3
+alias gasRatio r4
+alias deviceName r5
+alias filterWasActive r6
+alias threshold r7
+alias targetPressure r8
+alias runFilter r9
+alias productPressure r10
+alias capacity r11
+alias scratch r12
+alias stateIndex r13
 define FILTER -348054045
-define INPUT_NAME HASH("Filter Input")
-define N2O_NAME HASH("Nitrous Oxide")
-define O2_NAME HASH("Oxygen")
-define H2_NAME HASH("Hydrogen")
-define CH4_NAME HASH("Methane")
-define POL_NAME HASH("Pollutant")
+define ALERT -1535893860
+define DIODE 576516101
 define N2_NAME HASH("Nitrogen")
+define CH4_NAME HASH("Methane")
+define O2_NAME HASH("Oxygen")
 define CO2_NAME HASH("Carbon Dioxide")
+define N2O_NAME HASH("Nitrous Oxide")
+define H2_NAME HASH("Hydrogen")
+define POL_NAME HASH("Pollutant")
+define INPUT_START 4500
+define INPUT_STOP 5000
 define PARTIAL_START 50
 define PARTIAL_STOP 20
-define PRODUCT_START 15000
-define PRODUCT_STOP 30000
-define MIN_FILTER_LIFE 5
+define PRODUCT_START 40000
+define PRODUCT_STOP 45000
+define LOW_FILTER_RATIO 0.25
+define RELIEF_PRESSURE 50000
+init:
+move feedWanted 0
+move runMask 0
+jal powerOff
+s feed Lock 1
+s relief Setting RELIEF_PRESSURE
+s relief Lock 1
+s analyzer On 1
+s analyzer Lock 1
 loop:
 yield
-lbn r13 ANALYZER INPUT_NAME Pressure Average
-lbn r0 ANALYZER INPUT_NAME RatioNitrousOxide Average
-move r1 N2O_NAME
+s analyzer On 1
+l status analyzer Power
+beqz status shutdown
+l status analyzer Error
+bnez status shutdown
+l pressure analyzer Pressure
+bnan pressure shutdown
+sgt status pressure RELIEF_PRESSURE
+s relief On status
+l gasRatio analyzer RatioNitrogen
+move deviceName N2_NAME
+move stateIndex 0
 jal control
-lbn r0 ANALYZER INPUT_NAME RatioOxygen Average
-move r1 O2_NAME
+l gasRatio analyzer RatioMethane
+move deviceName CH4_NAME
+move stateIndex 1
 jal control
-lbn r0 ANALYZER INPUT_NAME RatioHydrogen Average
-move r1 H2_NAME
+l gasRatio analyzer RatioOxygen
+move deviceName O2_NAME
+move stateIndex 2
 jal control
-lbn r0 ANALYZER INPUT_NAME RatioMethane Average
-move r1 CH4_NAME
+l gasRatio analyzer RatioCarbonDioxide
+move deviceName CO2_NAME
+move stateIndex 3
 jal control
-lbn r0 ANALYZER INPUT_NAME RatioPollutant Average
-move r1 POL_NAME
+l gasRatio analyzer RatioNitrousOxide
+move deviceName N2O_NAME
+move stateIndex 4
 jal control
-lbn r0 ANALYZER INPUT_NAME RatioNitrogen Average
-move r1 N2_NAME
+l gasRatio analyzer RatioHydrogen
+move deviceName H2_NAME
+move stateIndex 5
 jal control
-lbn r0 ANALYZER INPUT_NAME RatioCarbonDioxide Average
-move r1 CO2_NAME
+l gasRatio analyzer RatioPollutant
+move deviceName POL_NAME
+move stateIndex 6
 jal control
+select status feedWanted INPUT_STOP INPUT_START
+slt feedWanted pressure status
+s feed On feedWanted
 j loop
+shutdown:
+move feedWanted 0
+move runMask 0
+jal powerOff
+j loop
+powerOff:
+sb FILTER Mode 0
+sb FILTER On 0
+s feed On 0
+s relief On 0
+j ra
 control:
-lbn r2 FILTER r1 On Maximum
-sgtz r2 r2
-select r3 r2 PARTIAL_STOP PARTIAL_START
-mul r4 r13 r0
-sge r7 r4 r3
-lbn r5 ANALYZER r1 Pressure Average
-select r6 r2 PRODUCT_STOP PRODUCT_START
-slt r8 r5 r6
-and r7 r7 r8
-lbns r8 FILTER r1 0 Quantity Maximum
-lbns r9 FILTER r1 1 Quantity Maximum
-max r8 r8 r9
-sgt r8 r8 MIN_FILTER_LIFE
-and r7 r7 r8
-sbn FILTER r1 On r7
+ext filterWasActive runMask stateIndex 1
+mul targetPressure pressure gasRatio
+beqz filterWasActive starting
+sge runFilter targetPressure PARTIAL_STOP
+j gasChecked
+starting:
+sgt runFilter targetPressure PARTIAL_START
+gasChecked:
+lbn productPressure FILTER deviceName PressureOutput Maximum
+select threshold filterWasActive PRODUCT_STOP PRODUCT_START
+slt scratch productPressure threshold
+and runFilter runFilter scratch
+lbns capacity FILTER deviceName 0 Quantity Maximum
+lbns scratch FILTER deviceName 1 Quantity Maximum
+add capacity capacity scratch
+div threshold capacity 200
+clamp threshold threshold 0 1
+sbn DIODE deviceName On 0
+sbn DIODE deviceName Setting threshold
+sle scratch threshold LOW_FILTER_RATIO
+sbn ALERT deviceName On scratch
+sgtz scratch capacity
+and runFilter runFilter scratch
+ins runMask runFilter stateIndex 1
+sbn FILTER deviceName Mode runFilter
+sbn FILTER deviceName On runFilter
 j ra
