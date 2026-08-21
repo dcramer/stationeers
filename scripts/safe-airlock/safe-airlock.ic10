@@ -1,4 +1,4 @@
-define INNER_PRESSURE 100
+define INNER_PRESSURE 0
 define OUTER_PRESSURE 0
 define VACUUM_PRESSURE 0.1
 define PRESSURE_TOLERANCE 1
@@ -8,10 +8,7 @@ alias outerDoor d1
 alias innerVent d2
 alias outerVent d3
 alias sensor d4
-alias waitCount r0
-alias value r1
-alias target r2
-alias side r3
+alias light d5
 bdns innerDoor configFault
 bdns outerDoor configFault
 bdns innerVent configFault
@@ -25,8 +22,8 @@ move r4 3
 move r5 2
 move r6 0
 move r7 1
-move target INNER_PRESSURE
-move side 0
+move r2 INNER_PRESSURE
+move r3 0
 j cycle
 configFault:
 s db Setting -2
@@ -34,33 +31,37 @@ yield
 j configFault
 cycle:
 s db Setting 2
+brdns light 2
+s light On 1
 jal seal
 s dr4 Mode 1
 s dr4 PressureExternal VACUUM_PRESSURE
 s dr4 On 1
 jal waitVacuum
 s dr4 On 0
-ble target VACUUM_PRESSURE openDestination
+ble r2 VACUUM_PRESSURE openDestination
 s dr5 Mode 0
-s dr5 PressureExternal target
+s dr5 PressureExternal r2
 s dr5 On 1
-sub r8 target PRESSURE_TOLERANCE
+sub r8 r2 PRESSURE_TOLERANCE
 jal waitPressure
 s dr5 On 0
 openDestination:
 s innerVent On 0
 s outerVent On 0
 s dr6 Open 1
-move waitCount 0
+move r0 0
 waitOpen:
 yield
-l value dr6 Open
-bnez value idle
-add waitCount waitCount 1
-bge waitCount WAIT_LIMIT fault
+l r1 dr6 Open
+bnez r1 idle
+add r0 r0 1
+bge r0 WAIT_LIMIT fault
 j waitOpen
 idle:
-s db Setting side
+brdns light 2
+s light On 0
+s db Setting r3
 s dr6 Setting 1
 s dr7 Setting 0
 s innerDoor Lock 0
@@ -68,8 +69,8 @@ s outerDoor Lock 0
 idleWait:
 yield
 l r8 dr7 Setting
-l value dr7 Open
-bne r8 value requested
+l r1 dr7 Open
+bne r8 r1 requested
 j idleWait
 requested:
 move r8 r4
@@ -78,41 +79,41 @@ move r5 r8
 move r8 r6
 move r6 r7
 move r7 r8
-seqz side side
-select target side OUTER_PRESSURE INNER_PRESSURE
+seqz r3 r3
+select r2 r3 OUTER_PRESSURE INNER_PRESSURE
 j cycle
 seal:
 s innerDoor Lock 1
 s outerDoor Lock 1
 s innerDoor Open 0
 s outerDoor Open 0
-move waitCount 0
+move r0 0
 sealWait:
 yield
-l value innerDoor Open
+l r1 innerDoor Open
 l r8 outerDoor Open
-or value value r8
-beqz value ra
-add waitCount waitCount 1
-bge waitCount WAIT_LIMIT fault
+or r1 r1 r8
+beqz r1 ra
+add r0 r0 1
+bge r0 WAIT_LIMIT fault
 j sealWait
 waitVacuum:
-move waitCount 0
+move r0 0
 vacuumWait:
 yield
-l value sensor Pressure
-ble value VACUUM_PRESSURE ra
-add waitCount waitCount 1
-bge waitCount WAIT_LIMIT fault
+l r1 sensor Pressure
+ble r1 VACUUM_PRESSURE ra
+add r0 r0 1
+bge r0 WAIT_LIMIT fault
 j vacuumWait
 waitPressure:
-move waitCount 0
+move r0 0
 pressureWait:
 yield
-l value sensor Pressure
-bge value r8 ra
-add waitCount waitCount 1
-bge waitCount WAIT_LIMIT fault
+l r1 sensor Pressure
+bge r1 r8 ra
+add r0 r0 1
+bge r0 WAIT_LIMIT fault
 j pressureWait
 fault:
 s innerVent On 0

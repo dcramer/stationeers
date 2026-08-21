@@ -32,6 +32,12 @@
       "prefab": "StructureGasSensor",
       "pin": "d4",
       "props": { "Pressure": 50 }
+    },
+    {
+      "id": 25,
+      "prefab": "StructureFlashingLight",
+      "pin": "d5",
+      "props": { "On": 0 }
     }
   ],
   "changes": [
@@ -47,8 +53,9 @@
       "10": { "Setting": 0 },
       "20": { "Setting": 1, "Open": 1, "Lock": 0 },
       "21": { "Setting": 0, "Open": 0, "Lock": 0 },
-      "22": { "Mode": 0, "On": 0, "PressureExternal": 100 },
-      "23": { "Mode": 1, "On": 0, "PressureExternal": 0.1 }
+      "22": { "Mode": 1, "On": 0, "PressureExternal": 0.1 },
+      "23": { "Mode": 1, "On": 0, "PressureExternal": 0.1 },
+      "25": { "On": 0 }
     }
   }
 }
