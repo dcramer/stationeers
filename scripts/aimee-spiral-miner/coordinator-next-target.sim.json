@@ -3,16 +3,16 @@
   "script": "coordinator.ic10",
   "steps": 160,
   "devices": [
-    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 467 } },
-    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
+    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 326 } },
+    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -90 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": -81 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 0 } },
     { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 0 } }
   ],
   "expect": {
     "devices": {
-      "20": { "Setting": 467 },
-      "21": { "Setting": -236 },
+      "20": { "Setting": 326 },
+      "21": { "Setting": -85 },
       "22": { "Setting": 82 },
       "23": { "Setting": 0 },
       "24": { "Setting": 0 }

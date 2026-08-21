@@ -3,8 +3,8 @@
   "script": "supervisor.ic10",
   "steps": 500,
   "devices": [
-    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 467 } },
-    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
+    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 326 } },
+    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -90 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": -10200 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 2 } },
     { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 0 } },

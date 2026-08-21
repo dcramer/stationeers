@@ -3,8 +3,8 @@ alias commZ d1
 alias job d2
 alias command d3
 alias status d4
-define BASE_X 442
-define BASE_Z -221
+define BASE_X 301
+define BASE_Z -70
 define SAFE_ZONE 25
 define STEP 5
 define MAX_RANGE 120

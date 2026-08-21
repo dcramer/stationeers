@@ -99,8 +99,8 @@ Coordinator defaults:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `BASE_X` | 442 | Spiral center X, due east of the hangar |
-| `BASE_Z` | -221 | Spiral center Z, aligned with the approach |
+| `BASE_X` | 301 | Spiral center X, aligned with the unload point |
+| `BASE_Z` | -70 | Spiral center Z, north of the base |
 | `SAFE_ZONE` | 25 | First complete square ring's distance from center |
 | `STEP` | 5 | Grid spacing between mining targets |
 | `MAX_RANGE` | 120 | Maximum circular distance from center |
@@ -118,32 +118,45 @@ The supplied exclusion bounds already include the intended AIMeE roaming
 margin. In particular, the southern safety boundary is Z -430. The coordinator
 uses the bounds directly and does not add another automatic margin.
 
-The mining center `(442, -221)` lies 141 meters due east of the unload point
-`(301, -221)`. The waypoint remains on the west side of the physical hangar at
-`(260, -221)`, 41 meters west of unload, so the final approach travels due east.
-It is not mirrored with the mining field. With `MAX_RANGE` 120, generated
-targets extend from X 322 through X 562 on the east side of the base.
-AIMeE can roam about 15 meters from a target. The exclusion rectangle removes
-generated targets that overlap the mapped base boundary; it does not constrain
-travel between targets. The farthest target is about 260 meters from the chute.
+The mining center `(301, -70)` lies 151 meters due north of the unload point
+`(301, -221)`. With `MAX_RANGE` 120, generated targets extend from X 181 through
+X 421 and from Z -190 through Z 50. The field's southern edge is 31 meters north
+of unload. AIMeE can roam about 15 meters from a target, leaving a nominal
+16-meter separation at that closest edge. The exclusion rectangle lies south
+of the supplied mining circle and therefore skips no targets with these
+defaults; it remains available if the center or range is later moved south.
+The farthest target is about 271 meters from the chute.
+
+The waypoint remains on the west side of the physical hangar at `(260, -221)`,
+41 meters west of unload, so the final hangar approach travels due east. The
+waypoint is a travel route and does not set the mining field direction.
 
 ### Area map and layout history
 
 Coordinates use north as increasing Z and east as increasing X. This schematic
 is not to scale:
 
+Open [`mining-map.html`](mining-map.html) for an interactive world-coordinate
+grid with the mapped base boundary, historical field footprints, exact active
+targets, and a progress overlay driven by the `Spiral Job` memory value.
+
 ```text
                               north (+Z)
                                   ^
                                   |
- west (-X) <---- waypoint ---- unload -------+-------------- mining center ----> east (+X)
-                (260,-221)   (301,-221)                       (442,-221)
+                         mining center
+                           (301,-70)
+                                  |
+                         field edge Z -190
+                                  |
+ west (-X) <---- waypoint ---- unload ----------------------> east (+X)
+                (260,-221)   (301,-221)
                                   |
                                   v
                               south (-Z)
 
  Base exclusion: X 270..328, Z -430..-214
- Mining circle:  center (442,-221), radius 120; generated X 322..562
+ Mining circle:  center (301,-70), radius 120; X 181..421, Z -190..50
  Return route:   mining field -> waypoint -> unload
  Departure:      unload -> waypoint -> active mining target
 ```
@@ -154,7 +167,8 @@ Keep this history when tuning coordinates so each push has a known reference:
 |---|---|---|---|---|
 | Original north | `(303, -120)` | `(303, -190)` | `(303, -228)` | Southbound |
 | West push | `(162, -221)` | `(282, -221)` | `(302, -221)` | Eastbound |
-| East field (active) | `(442, -221)` | `(260, -221)` | `(301, -221)` | Eastbound |
+| East field | `(442, -221)` | `(260, -221)` | `(301, -221)` | Eastbound |
+| North field (active) | `(301, -70)` | `(260, -221)` | `(301, -221)` | Eastbound |
 
 Miner defaults:
 
@@ -328,7 +342,7 @@ test, and `ra` is used by the non-nested `danger` and `displays` calls.
 
 ## Simulator scenarios
 
-Sibling scenarios cover first/next target publication, exclusion-zone skipping,
+Sibling scenarios cover first/next and western-edge target publication,
 command holds, range completion, Mode-2 completion waits, the post-park outbound
 waypoint, mining continuation, target acknowledgement, miner recall, safe
 supervisor startup, manual and weather recall with post-park door closure, reset

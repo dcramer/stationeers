@@ -11,9 +11,9 @@
   ],
   "expect": {
     "devices": {
-      "20": { "Setting": 442 },
-      "21": { "Setting": -341 },
-      "22": { "Setting": 2376 },
+      "20": { "Setting": 181 },
+      "21": { "Setting": -70 },
+      "22": { "Setting": 2328 },
       "23": { "Setting": 0 }
     }
   }

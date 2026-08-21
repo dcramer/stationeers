@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIMeE Mining Survey</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #08100f;
+      --panel: #0d1816;
+      --panel-2: #111f1c;
+      --line: #284038;
+      --text: #e5eee9;
+      --muted: #91a69e;
+      --north: #7ee787;
+      --original: #e9b96e;
+      --west: #c99cff;
+      --east: #62c8ff;
+      --danger: #ff6b63;
+      --route: #f4e5a1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 78% 0%, rgba(64, 130, 104, .14), transparent 34rem),
+        linear-gradient(145deg, #07100e, #0a1211 54%, #07100e);
+      color: var(--text);
+      font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(270px, 340px) minmax(560px, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: relative;
+      z-index: 2;
+      padding: 30px 26px 24px;
+      background: rgba(10, 20, 18, .94);
+      border-right: 1px solid var(--line);
+      box-shadow: 16px 0 48px rgba(0, 0, 0, .2);
+      overflow: auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--north);
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 10ch;
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
+
+    .lede {
+      margin: 16px 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notice {
+      padding: 11px 12px;
+      color: #c9d8d2;
+      background: #13231f;
+      border: 1px solid #2d4a40;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .section {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 11px;
+      color: #cfe1da;
+      font-size: 12px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      min-height: 34px;
+      color: #d6e3de;
+      cursor: pointer;
+    }
+
+    .layer input { accent-color: currentColor; }
+    .layer small { color: var(--muted); }
+    .layer.original { color: var(--original); }
+    .layer.west { color: var(--west); }
+    .layer.east { color: var(--east); }
+    .layer.north { color: var(--north); }
+    .layer.base { color: var(--danger); }
+
+    .job-row {
+      display: grid;
+      grid-template-columns: 1fr 92px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .job-row label { color: #d6e3de; }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 9px;
+      color: var(--text);
+      background: #081310;
+      border: 1px solid #355046;
+      border-radius: 7px;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--north);
+      box-shadow: 0 0 0 2px rgba(126, 231, 135, .13);
+    }
+
+    .help, .progress-copy {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 6px 9px;
+      color: #bcd0c9;
+      background: #12211d;
+      border: 1px solid #30483f;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover { color: white; border-color: #58776c; }
+
+    dl {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px 14px;
+      margin: 0;
+    }
+
+    dt { color: var(--muted); }
+    dd {
+      margin: 0;
+      color: #e7f1ed;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    main {
+      position: relative;
+      min-width: 0;
+      min-height: 100vh;
+      padding: 18px;
+    }
+
+    .map-card {
+      position: relative;
+      height: calc(100vh - 36px);
+      min-height: 650px;
+      overflow: hidden;
+      background: #091411;
+      border: 1px solid #2b4039;
+      border-radius: 12px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, .28);
+    }
+
+    svg { display: block; width: 100%; height: 100%; }
+
+    .map-title {
+      position: absolute;
+      top: 17px;
+      left: 20px;
+      z-index: 3;
+      padding: 7px 10px;
+      color: #cbdad4;
+      background: rgba(7, 16, 14, .82);
+      border: 1px solid #2a4239;
+      border-radius: 7px;
+      backdrop-filter: blur(8px);
+      font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .readout {
+      position: absolute;
+      right: 17px;
+      bottom: 15px;
+      z-index: 3;
+      min-width: 154px;
+      padding: 7px 10px;
+      color: #cfe2db;
+      background: rgba(7, 16, 14, .86);
+      border: 1px solid #2a4239;
+      border-radius: 7px;
+      font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-align: right;
+    }
+
+    .tooltip {
+      position: fixed;
+      z-index: 9;
+      display: none;
+      pointer-events: none;
+      padding: 8px 10px;
+      color: #eef8f4;
+      background: rgba(5, 12, 10, .96);
+      border: 1px solid #426457;
+      border-radius: 7px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+    }
+
+    .grid-minor { stroke: #183029; stroke-width: .65; }
+    .grid-major { stroke: #29463c; stroke-width: 1; }
+    .axis-text { fill: #718a81; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .axis-title { fill: #a5bbb3; font: 700 11px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .12em; }
+    .history-boundary { fill-opacity: .045; stroke-width: 1.4; stroke-dasharray: 5 6; }
+    .history-points { fill: none; stroke-linecap: round; stroke-width: 2.4; opacity: .42; }
+    .active-boundary { fill: rgba(126, 231, 135, .035); stroke: var(--north); stroke-width: 2; }
+    .future-points { fill: none; stroke: #4f8a62; stroke-linecap: round; stroke-width: 2.8; opacity: .65; }
+    .complete-points { fill: none; stroke: #d3ffd5; stroke-linecap: round; stroke-width: 4.4; }
+    .excluded-points { fill: none; stroke: #ff8d85; stroke-linecap: round; stroke-width: 2.4; opacity: .65; }
+    .center-mark { fill: #07100e; stroke-width: 2; }
+    .route-line { fill: none; stroke: var(--route); stroke-width: 2.2; stroke-dasharray: 7 6; opacity: .86; }
+    .route-marker { fill: #091411; stroke: var(--route); stroke-width: 2.5; }
+    .base-boundary { fill: url(#dangerHatch); stroke: var(--danger); stroke-width: 2; }
+    .map-label { paint-order: stroke; stroke: #091411; stroke-width: 4px; stroke-linejoin: round; font: 700 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .map-label-muted { fill: #a8bbb4; font-weight: 500; }
+    .current-target { fill: #07100e; stroke: #fff7b2; stroke-width: 3; filter: drop-shadow(0 0 5px rgba(255, 247, 178, .7)); }
+    .crosshair { stroke: #9eb2aa; stroke-width: 1; stroke-dasharray: 2 5; opacity: 0; pointer-events: none; }
+    .hit-point { fill: transparent; cursor: crosshair; }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+      h1 { max-width: none; }
+      main { min-height: 720px; }
+      .map-card { height: 680px; min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <p class="eyebrow">AIMeE / Surface survey</p>
+      <h1>Mining footprint map</h1>
+      <p class="lede">World-coordinate grid reconstructed from the controller history and current IC10 constants.</p>
+
+      <div class="notice">
+        This is repository history, not live telemetry. Past circles show where AIMeE was configured to mine; they do not prove every target completed.
+      </div>
+
+      <section class="section">
+        <h2>Map layers</h2>
+        <label class="layer base"><input type="checkbox" data-layer="base" checked><span>Base exclusion boundary</span><small>mapped</small></label>
+        <label class="layer original"><input type="checkbox" data-layer="original" checked><span>Original north field</span><small>historic</small></label>
+        <label class="layer west"><input type="checkbox" data-layer="west" checked><span>West field</span><small>historic</small></label>
+        <label class="layer east"><input type="checkbox" data-layer="east" checked><span>East field</span><small>historic</small></label>
+        <label class="layer north"><input type="checkbox" data-layer="north" checked><span>North field</span><small>active</small></label>
+      </section>
+
+      <section class="section">
+        <h2>Current run progress</h2>
+        <div class="job-row">
+          <label for="jobValue">Spiral Job memory</label>
+          <input id="jobValue" type="number" min="-2400" max="2400" step="1" value="0" inputmode="numeric">
+        </div>
+        <p class="help">Positive = current target active. Negative = that target acknowledged. Zero = reset/not started.</p>
+        <div class="quick-actions">
+          <button type="button" data-job="0">Reset</button>
+          <button type="button" data-job="81">First target</button>
+          <button type="button" data-job="-2400">Show full field</button>
+        </div>
+        <p id="progressCopy" class="progress-copy">No live progress entered.</p>
+      </section>
+
+      <section class="section">
+        <h2>Current geometry</h2>
+        <dl>
+          <dt>Unload / base</dt><dd>301, -221</dd>
+          <dt>Waypoint</dt><dd>260, -221</dd>
+          <dt>Mining center</dt><dd>301, -70</dd>
+          <dt>Target spacing</dt><dd>5 m</dd>
+          <dt>Field radius</dt><dd>120 m</dd>
+          <dt>North / east</dt><dd>+Z / +X</dd>
+          <dt>Target count</dt><dd id="targetCount">—</dd>
+        </dl>
+      </section>
+    </aside>
+
+    <main>
+      <div class="map-card">
+        <div class="map-title">North is up · 25 m grid</div>
+        <div id="readout" class="readout">X — &nbsp; Z —</div>
+        <svg id="map" viewBox="0 0 900 830" role="img" aria-labelledby="mapTitle mapDesc">
+          <title id="mapTitle">AIMeE mining footprint coordinate map</title>
+          <desc id="mapDesc">Base exclusion boundary, route points, three historical mining fields, and the active north mining field.</desc>
+          <defs>
+            <pattern id="dangerHatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="9" height="9" fill="rgba(255,107,99,.055)"></rect>
+              <line x1="0" y1="0" x2="0" y2="9" stroke="rgba(255,107,99,.28)" stroke-width="3"></line>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="900" height="830" fill="#091411"></rect>
+          <g id="grid"></g>
+          <g id="fieldLayers"></g>
+          <g id="baseLayer" data-map-layer="base"></g>
+          <g id="routeLayer"></g>
+          <g id="labels"></g>
+          <line id="crossX" class="crosshair"></line>
+          <line id="crossZ" class="crosshair"></line>
+          <rect id="interactionPlane" x="75" y="30" width="792" height="750" fill="transparent"></rect>
+          <g id="hitPoints"></g>
+        </svg>
+      </div>
+    </main>
+  </div>
+  <div id="tooltip" class="tooltip"></div>
+
+  <script>
+    const NS = "http://www.w3.org/2000/svg";
+    const bounds = { minX: 20, maxX: 585, minZ: -455, maxZ: 80 };
+    const plot = { left: 75, right: 867, top: 30, bottom: 780 };
+    const colors = {
+      original: "#e9b96e",
+      west: "#c99cff",
+      east: "#62c8ff",
+      north: "#7ee787"
+    };
+
+    const layouts = [
+      { id: "original", label: "Original north", centerX: 303, centerZ: -120, radius: 120, exclusion: [270, 328, -364, -214], historic: true },
+      { id: "west", label: "West push", centerX: 162, centerZ: -221, radius: 120, exclusion: [270, 328, -430, -214], historic: true },
+      { id: "east", label: "East field", centerX: 442, centerZ: -221, radius: 120, exclusion: [270, 328, -430, -214], historic: true },
+      { id: "north", label: "North field · active", centerX: 301, centerZ: -70, radius: 120, exclusion: [270, 328, -430, -214], historic: false }
+    ];
+
+    const sx = x => plot.left + (x - bounds.minX) / (bounds.maxX - bounds.minX) * (plot.right - plot.left);
+    const sy = z => plot.bottom - (z - bounds.minZ) / (bounds.maxZ - bounds.minZ) * (plot.bottom - plot.top);
+    const worldX = px => bounds.minX + (px - plot.left) / (plot.right - plot.left) * (bounds.maxX - bounds.minX);
+    const worldZ = py => bounds.minZ + (plot.bottom - py) / (plot.bottom - plot.top) * (bounds.maxZ - bounds.minZ);
+
+    function el(name, attrs = {}, text = "") {
+      const node = document.createElementNS(NS, name);
+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+      if (text) node.textContent = text;
+      return node;
+    }
+
+    function targetForJob(job, layout) {
+      const ring = Math.ceil((Math.sqrt(job + 1) - 1) / 2);
+      const side = ring * 2;
+      let reverse = (side + 1) ** 2 - 1 - job;
+      let gx;
+      let gz;
+      if (reverse < side) {
+        gx = ring - reverse;
+        gz = -ring;
+      } else if (reverse < side * 2) {
+        gx = -ring;
+        gz = -ring + (reverse - side);
+      } else if (reverse < side * 3) {
+        gx = -ring + (reverse - side * 2);
+        gz = ring;
+      } else {
+        gx = ring;
+        reverse -= side * 3;
+        gz = ring - reverse;
+      }
+
+      const dx = gx * 5;
+      const dz = gz * 5;
+      if (Math.hypot(dx, dz) > layout.radius) return null;
+      const x = layout.centerX + dx;
+      const z = layout.centerZ + dz;
+      const [minX, maxX, minZ, maxZ] = layout.exclusion;
+      const excluded = x >= minX && x <= maxX && z >= minZ && z <= maxZ;
+      return { job, x, z, excluded };
+    }
+
+    function targetsFor(layout) {
+      const points = [];
+      for (let job = 81; job <= 2400; job += 1) {
+        const target = targetForJob(job, layout);
+        if (target) points.push(target);
+      }
+      return points;
+    }
+
+    layouts.forEach(layout => { layout.targets = targetsFor(layout); });
+    const active = layouts.find(layout => layout.id === "north");
+    const activeTargets = active.targets.filter(point => !point.excluded);
+
+    function pathFor(points) {
+      return points.map(point => `M${sx(point.x).toFixed(2)},${sy(point.z).toFixed(2)}h.01`).join("");
+    }
+
+    function drawGrid() {
+      const group = document.getElementById("grid");
+      group.append(el("rect", {
+        x: plot.left,
+        y: plot.top,
+        width: plot.right - plot.left,
+        height: plot.bottom - plot.top,
+        fill: "#0a1713",
+        stroke: "#365047"
+      }));
+
+      for (let x = 25; x <= 575; x += 25) {
+        const major = x % 100 === 0;
+        group.append(el("line", { x1: sx(x), x2: sx(x), y1: plot.top, y2: plot.bottom, class: major ? "grid-major" : "grid-minor" }));
+        if (major) group.append(el("text", { x: sx(x), y: 802, class: "axis-text", "text-anchor": "middle" }, String(x)));
+      }
+
+      for (let z = -450; z <= 75; z += 25) {
+        const major = z % 100 === 0;
+        group.append(el("line", { x1: plot.left, x2: plot.right, y1: sy(z), y2: sy(z), class: major ? "grid-major" : "grid-minor" }));
+        if (major) group.append(el("text", { x: 64, y: sy(z) + 3.5, class: "axis-text", "text-anchor": "end" }, String(z)));
+      }
+
+      group.append(el("text", { x: 470, y: 824, class: "axis-title", "text-anchor": "middle" }, "WORLD X  ·  EAST +"));
+      group.append(el("text", { x: 17, y: 406, class: "axis-title", "text-anchor": "middle", transform: "rotate(-90 17 406)" }, "WORLD Z  ·  NORTH +"));
+      group.append(el("path", { d: "M842 75l9-16 9 16-9-5z", fill: "#a5bbb3" }));
+      group.append(el("text", { x: 851, y: 91, class: "axis-title", "text-anchor": "middle" }, "N"));
+    }
+
+    function drawFields() {
+      const parent = document.getElementById("fieldLayers");
+      for (const layout of layouts) {
+        const group = el("g", { "data-map-layer": layout.id });
+        const radiusPx = layout.radius * (plot.right - plot.left) / (bounds.maxX - bounds.minX);
+        group.append(el("circle", {
+          cx: sx(layout.centerX),
+          cy: sy(layout.centerZ),
+          r: radiusPx,
+          class: layout.historic ? "history-boundary" : "active-boundary",
+          fill: colors[layout.id],
+          stroke: colors[layout.id]
+        }));
+
+        const included = layout.targets.filter(point => !point.excluded);
+        const excluded = layout.targets.filter(point => point.excluded);
+        if (layout.historic) {
+          group.append(el("path", { d: pathFor(included), class: "history-points", stroke: colors[layout.id] }));
+        } else {
+          const future = el("path", { id: "futurePath", d: pathFor(included), class: "future-points" });
+          const complete = el("path", { id: "completePath", d: "", class: "complete-points" });
+          const current = el("circle", { id: "currentTarget", r: 7, class: "current-target", visibility: "hidden" });
+          group.append(future, complete, current);
+        }
+        if (excluded.length) group.append(el("path", { d: pathFor(excluded), class: "excluded-points" }));
+
+        group.append(el("circle", {
+          cx: sx(layout.centerX),
+          cy: sy(layout.centerZ),
+          r: 5,
+          class: "center-mark",
+          stroke: colors[layout.id]
+        }));
+        parent.append(group);
+      }
+    }
+
+    function drawBaseAndRoute() {
+      const base = document.getElementById("baseLayer");
+      base.append(el("rect", {
+        x: sx(270),
+        y: sy(-214),
+        width: sx(328) - sx(270),
+        height: sy(-430) - sy(-214),
+        class: "base-boundary"
+      }));
+
+      const route = document.getElementById("routeLayer");
+      route.append(el("path", { d: `M${sx(260)},${sy(-221)}L${sx(301)},${sy(-221)}`, class: "route-line" }));
+      route.append(el("circle", { cx: sx(260), cy: sy(-221), r: 7, class: "route-marker" }));
+      route.append(el("rect", { x: sx(301) - 6, y: sy(-221) - 6, width: 12, height: 12, rx: 2, class: "route-marker" }));
+    }
+
+    function drawLabels() {
+      const labels = document.getElementById("labels");
+      const add = (x, z, text, color, anchor = "start", dx = 10, dy = -10, muted = "") => {
+        labels.append(el("text", { x: sx(x) + dx, y: sy(z) + dy, fill: color, class: "map-label", "text-anchor": anchor }, text));
+        if (muted) labels.append(el("text", { x: sx(x) + dx, y: sy(z) + dy + 14, class: "map-label map-label-muted", "text-anchor": anchor }, muted));
+      };
+      add(303, -120, "ORIGINAL NORTH", colors.original, "start", 10, -10, "center 303, -120");
+      add(162, -221, "WEST FIELD", colors.west, "middle", 0, -172, "center 162, -221");
+      add(442, -221, "EAST FIELD", colors.east, "middle", 0, -172, "center 442, -221");
+      add(301, -70, "ACTIVE NORTH", colors.north, "start", 10, -10, "center 301, -70");
+      add(270, -430, "BASE EXCLUSION", "#ff8d85", "start", 8, -8, "X 270..328 · Z -430..-214");
+      add(260, -221, "WAYPOINT", "#f4e5a1", "end", -11, 4, "260, -221");
+      add(301, -221, "UNLOAD / BASE", "#f4e5a1", "start", 11, 4, "301, -221");
+    }
+
+    function drawHitPoints() {
+      const group = document.getElementById("hitPoints");
+      for (const point of activeTargets) {
+        group.append(el("circle", {
+          cx: sx(point.x),
+          cy: sy(point.z),
+          r: 5.5,
+          class: "hit-point",
+          "data-job": point.job,
+          "data-x": point.x,
+          "data-z": point.z
+        }));
+      }
+    }
+
+    function updateProgress() {
+      const raw = Number.parseInt(document.getElementById("jobValue").value, 10) || 0;
+      const absolute = Math.min(2400, Math.abs(raw));
+      const complete = activeTargets.filter(point => raw < 0 ? point.job <= absolute : point.job < absolute);
+      const future = activeTargets.filter(point => !complete.includes(point));
+      const current = raw === 0 ? null : activeTargets.find(point => point.job === absolute);
+
+      document.getElementById("completePath").setAttribute("d", pathFor(complete));
+      document.getElementById("futurePath").setAttribute("d", pathFor(future));
+      const marker = document.getElementById("currentTarget");
+      if (current && raw > 0) {
+        marker.setAttribute("cx", sx(current.x));
+        marker.setAttribute("cy", sy(current.z));
+        marker.setAttribute("visibility", "visible");
+      } else {
+        marker.setAttribute("visibility", "hidden");
+      }
+
+      const copy = document.getElementById("progressCopy");
+      if (raw === 0) {
+        copy.textContent = "No live progress entered. Active field remains shown as planned targets.";
+      } else {
+        const state = raw < 0 ? `Job ${absolute} acknowledged` : `Job ${absolute} active`;
+        copy.textContent = `${state} · ${complete.length} of ${activeTargets.length} valid targets shown complete.`;
+      }
+    }
+
+    function wireInteractions() {
+      document.querySelectorAll("[data-layer]").forEach(control => {
+        control.addEventListener("change", () => {
+          document.querySelectorAll(`[data-map-layer="${control.dataset.layer}"]`).forEach(layer => {
+            layer.style.display = control.checked ? "" : "none";
+          });
+        });
+      });
+
+      const jobInput = document.getElementById("jobValue");
+      jobInput.addEventListener("input", updateProgress);
+      document.querySelectorAll("[data-job]").forEach(button => {
+        button.addEventListener("click", () => {
+          jobInput.value = button.dataset.job;
+          updateProgress();
+        });
+      });
+
+      const svg = document.getElementById("map");
+      const plane = document.getElementById("interactionPlane");
+      const readout = document.getElementById("readout");
+      const crossX = document.getElementById("crossX");
+      const crossZ = document.getElementById("crossZ");
+      const tooltip = document.getElementById("tooltip");
+
+      const localPoint = event => {
+        const point = svg.createSVGPoint();
+        point.x = event.clientX;
+        point.y = event.clientY;
+        return point.matrixTransform(svg.getScreenCTM().inverse());
+      };
+
+      plane.addEventListener("mousemove", event => {
+        const point = localPoint(event);
+        const x = Math.round(worldX(point.x));
+        const z = Math.round(worldZ(point.y));
+        readout.textContent = `X ${x}   Z ${z}`;
+        crossX.setAttribute("x1", point.x);
+        crossX.setAttribute("x2", point.x);
+        crossX.setAttribute("y1", plot.top);
+        crossX.setAttribute("y2", plot.bottom);
+        crossZ.setAttribute("x1", plot.left);
+        crossZ.setAttribute("x2", plot.right);
+        crossZ.setAttribute("y1", point.y);
+        crossZ.setAttribute("y2", point.y);
+        crossX.style.opacity = .45;
+        crossZ.style.opacity = .45;
+      });
+
+      plane.addEventListener("mouseleave", () => {
+        crossX.style.opacity = 0;
+        crossZ.style.opacity = 0;
+      });
+
+      document.getElementById("hitPoints").addEventListener("mousemove", event => {
+        const target = event.target.closest(".hit-point");
+        if (!target) return;
+        tooltip.style.display = "block";
+        tooltip.style.left = `${event.clientX + 14}px`;
+        tooltip.style.top = `${event.clientY + 14}px`;
+        tooltip.textContent = `Job ${target.dataset.job} · X ${target.dataset.x} · Z ${target.dataset.z}`;
+      });
+      document.getElementById("hitPoints").addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
+    }
+
+    drawGrid();
+    drawFields();
+    drawBaseAndRoute();
+    drawLabels();
+    drawHitPoints();
+    document.getElementById("targetCount").textContent = activeTargets.length.toLocaleString();
+    updateProgress();
+    wireInteractions();
+  </script>
+</body>
+</html>

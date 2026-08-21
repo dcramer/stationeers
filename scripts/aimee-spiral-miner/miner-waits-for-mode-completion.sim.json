@@ -3,8 +3,8 @@
   "script": "miner.ic10",
   "steps": 80,
   "devices": [
-    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 467 } },
-    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
+    { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 326 } },
+    { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -90 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": 81 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 0 } },
     { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 1 } },
@@ -16,9 +16,9 @@
       "props": {
         "Error": 0,
         "Mode": 0,
-        "PositionX": 467,
+        "PositionX": 326,
         "PositionY": 4,
-        "PositionZ": -241,
+        "PositionZ": -90,
         "VelocityMagnitude": 1,
         "MineablesInVicinity": 0
       },
@@ -32,7 +32,7 @@
     "devices": {
       "22": { "Setting": 81 },
       "24": { "Setting": 0 },
-      "25": { "Mode": 2, "TargetX": 467, "TargetY": 4, "TargetZ": -241 }
+      "25": { "Mode": 2, "TargetX": 326, "TargetY": 4, "TargetZ": -90 }
     }
   }
 }
