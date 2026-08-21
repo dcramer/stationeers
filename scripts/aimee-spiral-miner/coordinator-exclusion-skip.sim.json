@@ -5,15 +5,15 @@
   "devices": [
     { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 0 } },
     { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": 0 } },
-    { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": -1848 } },
+    { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": -2327 } },
     { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 0 } },
     { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 0 } }
   ],
   "expect": {
     "devices": {
-      "20": { "Setting": 272 },
-      "21": { "Setting": -211 },
-      "22": { "Setting": 1872 },
+      "20": { "Setting": 442 },
+      "21": { "Setting": -341 },
+      "22": { "Setting": 2376 },
       "23": { "Setting": 0 }
     }
   }

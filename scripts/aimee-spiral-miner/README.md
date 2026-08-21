@@ -99,7 +99,7 @@ Coordinator defaults:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `BASE_X` | 162 | Spiral center X, due west of the hangar |
+| `BASE_X` | 442 | Spiral center X, due east of the hangar |
 | `BASE_Z` | -221 | Spiral center Z, aligned with the approach |
 | `SAFE_ZONE` | 25 | First complete square ring's distance from center |
 | `STEP` | 5 | Grid spacing between mining targets |
@@ -118,27 +118,56 @@ The supplied exclusion bounds already include the intended AIMeE roaming
 margin. In particular, the southern safety boundary is Z -430. The coordinator
 uses the bounds directly and does not add another automatic margin.
 
-The mining center `(162, -221)` lies 140 meters due west of the unload point
-`(302, -221)`. The waypoint `(282, -221)` is 20 meters west of unload, so the
-final approach travels due east. With `MAX_RANGE` 120, generated targets extend
-from X 42 through X 282 and never cross the waypoint line toward the base.
-AIMeE can roam about 15 meters from a target, so its eastern roaming edge can
-reach approximately X 297. The farthest target is about 260 meters from the
-chute. The existing exclusion rectangle remains unchanged.
+The mining center `(442, -221)` lies 140 meters due east of the unload point
+`(302, -221)`. The waypoint `(322, -221)` is 20 meters east of unload, so the
+final approach travels due west. With `MAX_RANGE` 120, generated targets extend
+from X 322 through X 562 and never cross the waypoint line toward the base.
+AIMeE can roam about 15 meters from a target. The exclusion rectangle removes
+generated targets that overlap the mapped base boundary; it does not constrain
+travel between targets. The farthest target is about 260 meters from the chute.
+
+### Area map and layout history
+
+Coordinates use north as increasing Z and east as increasing X. This schematic
+is not to scale:
+
+```text
+                              north (+Z)
+                                  ^
+                                  |
+ west (-X) <---- unload ----------+---------- waypoint ---- mining center ----> east (+X)
+                (302,-221)                  (322,-221)       (442,-221)
+                                  |
+                                  v
+                              south (-Z)
+
+ Base exclusion: X 270..328, Z -430..-214
+ Mining circle:  center (442,-221), radius 120; generated X 322..562
+ Return route:   mining field -> waypoint -> unload
+ Departure:      unload -> waypoint -> active mining target
+```
+
+Keep this history when tuning coordinates so each push has a known reference:
+
+| Layout | Spiral center | Waypoint | Unload | Approach |
+|---|---|---|---|---|
+| Original north | `(303, -120)` | `(303, -190)` | `(303, -228)` | Southbound |
+| West push | `(162, -221)` | `(282, -221)` | `(302, -221)` | Eastbound |
+| East push (active) | `(442, -221)` | `(322, -221)` | `(302, -221)` | Westbound |
 
 Miner defaults:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `WAYPOINT_X` | 282 | Clear hangar-entry point X |
+| `WAYPOINT_X` | 322 | Clear hangar-entry point X |
 | `WAYPOINT_Z` | -221 | Clear hangar-entry point Z |
 | `UNLOAD_X` | 302 | Intake chute/charger X |
 | `UNLOAD_Z` | -221 | Intake chute/charger Z |
 | `LOW_BATT` | 0.5 | Charge ratio that triggers return |
 | `READY_BATT` | 0.7 | Charge ratio required before release |
 
-The waypoint `(282, -221)` is aligned with the intake chute at `(302, -221)`.
-Confirm that it is outside the hangar and that the straight 20-meter eastbound
+The waypoint `(322, -221)` is aligned with the intake chute at `(302, -221)`.
+Confirm that it is outside the hangar and that the straight 20-meter westbound
 X approach is unobstructed before running unattended. Navigation uses an X/Z
 target and waits for AIMeE to leave Mode 2 naturally before starting the next
 operation. More than 20 consecutive updates below velocity 0.2 trigger Mode 5
@@ -215,8 +244,9 @@ this order:
 3. Coordinator: waits while recall is active, then publishes the first target.
 
 Once the lever is down and weather is safe, the supervisor opens the hangar
-before writing command 0. On every supervisor restart it performs the same
-recall-and-park proof instead of assuming AIMeE's location.
+before writing command 0. The miner clears parked status, navigates through the
+waypoint, and then resumes the active mining target. On every supervisor restart
+it performs the same recall-and-park proof instead of assuming AIMeE's location.
 
 For manual shutdown, raise `AIMeE Recall` and leave it raised. The bot returns,
 unloads, charges, the door closes, and the system remains parked. Lowering the
@@ -238,10 +268,11 @@ coordinator starts at the first ring.
 ## Mining and recovery
 
 The miner refreshes `TargetY` to AIMeE's current height throughout every route.
-At a target it repeats Mode 3 whenever mining stops while mineables still exist.
-Mode 6 or low battery returns through the waypoint, unloads, charges, and resumes
-the same target. An error selects Mode 0; after the error clears the miner
-attempts the return route.
+After unloading and charging, it leaves the hangar through the waypoint before
+resuming the active target. At a target it repeats Mode 3 whenever mining stops
+while mineables still exist. Mode 6 or low battery returns through the waypoint,
+unloads, charges, and resumes the same target. An error selects Mode 0; after the
+error clears the miner attempts the return route.
 
 Ordinary navigation checks command, battery, error, Mode-2 completion, and
 velocity.
@@ -297,9 +328,9 @@ test, and `ra` is used by the non-nested `danger` and `displays` calls.
 ## Simulator scenarios
 
 Sibling scenarios cover first/next target publication, exclusion-zone skipping,
-command holds, range completion, Mode-2 completion waits, mining continuation,
-target acknowledgement, miner recall, safe supervisor startup, manual and
-weather recall with post-park door closure, reset from latched completion, named
-display output, and completion hold. The emulator does not move, mine, unload,
-charge, or advance weather autonomously, so those transitions still require
-in-game testing.
+command holds, range completion, Mode-2 completion waits, the post-park outbound
+waypoint, mining continuation, target acknowledgement, miner recall, safe
+supervisor startup, manual and weather recall with post-park door closure, reset
+from latched completion, named display output, and completion hold. The emulator
+does not move, mine, unload, charge, or advance weather autonomously, so those
+transitions still require in-game testing.

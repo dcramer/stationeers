@@ -1,13 +1,13 @@
 {
   "version": 1,
   "script": "miner.ic10",
-  "steps": 80,
+  "steps": 240,
   "devices": [
     { "id": 20, "prefab": "StructureLogicMemory", "pin": "d0", "props": { "Setting": 467 } },
     { "id": 21, "prefab": "StructureLogicMemory", "pin": "d1", "props": { "Setting": -241 } },
     { "id": 22, "prefab": "StructureLogicMemory", "pin": "d2", "props": { "Setting": 81 } },
-    { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 0 } },
-    { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 1 } },
+    { "id": 23, "prefab": "StructureLogicMemory", "pin": "d3", "props": { "Setting": 1 } },
+    { "id": 24, "prefab": "StructureLogicMemory", "pin": "d4", "props": { "Setting": 0 } },
     {
       "id": 25,
       "prefab": "Robot",
@@ -15,24 +15,29 @@
       "virtual": true,
       "props": {
         "Error": 0,
-        "Mode": 0,
+        "Mode": 3,
         "PositionX": 467,
         "PositionY": 4,
         "PositionZ": -241,
         "VelocityMagnitude": 1,
-        "MineablesInVicinity": 0
+        "MineablesInVicinity": 1
       },
       "slots": [{ "index": 0, "item": "ItemBatteryCellLarge" }]
     }
   ],
   "changes": [
-    { "afterStep": 0, "slots": { "25": { "0": { "ChargeRatio": 1 } } } }
+    { "afterStep": 0, "slots": { "25": { "0": { "ChargeRatio": 1 } } } },
+    { "afterStep": 40, "devices": { "25": { "Mode": 0 } } },
+    { "afterStep": 110, "devices": { "25": { "Mode": 0 } } },
+    { "afterStep": 150, "devices": { "25": { "Mode": 0 } } },
+    { "afterStep": 180, "devices": { "23": { "Setting": 0 } } }
   ],
   "expect": {
     "devices": {
       "22": { "Setting": 81 },
+      "23": { "Setting": 0 },
       "24": { "Setting": 0 },
-      "25": { "Mode": 2, "TargetX": 467, "TargetY": 4, "TargetZ": -241 }
+      "25": { "Mode": 2, "TargetX": 322, "TargetY": 4, "TargetZ": -221 }
     }
   }
 }
