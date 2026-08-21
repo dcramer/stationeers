@@ -11,14 +11,14 @@
   ],
   "changes": [
     { "afterStep": 60, "devices": { "21": { "Setting": 1 } } },
-    { "afterStep": 120, "devices": { "24": { "Pressure": 0.05 } } }
+    { "afterStep": 120, "devices": { "24": { "Pressure": 0.1 } } }
   ],
   "expect": {
     "devices": {
       "20": { "Mode": 1, "Setting": 0, "Open": 0, "Lock": 0 },
       "21": { "Mode": 1, "Setting": 0, "Open": 0, "Lock": 0 },
       "22": { "On": 0 },
-      "23": { "Mode": 1, "On": 0, "PressureExternal": 0.1 }
+      "23": { "Mode": 1, "On": 0, "PressureExternal": 0 }
     }
   }
 }

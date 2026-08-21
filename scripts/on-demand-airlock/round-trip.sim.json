@@ -11,7 +11,7 @@
   ],
   "changes": [
     { "afterStep": 60, "devices": { "21": { "Setting": 1 } } },
-    { "afterStep": 120, "devices": { "24": { "Pressure": 0.05 } } },
+    { "afterStep": 120, "devices": { "24": { "Pressure": 0.1 } } },
     { "afterStep": 160, "devices": { "20": { "Setting": 1 } } }
   ],
   "expect": {
@@ -19,8 +19,8 @@
       "20": { "Mode": 1, "Setting": 1, "Open": 1, "Lock": 0 },
       "21": { "Mode": 1, "Setting": 0, "Open": 0, "Lock": 0 },
       "22": { "Mode": 0, "On": 0, "PressureExternal": 100 },
-      "23": { "Mode": 1, "On": 0, "PressureExternal": 0.1 },
-      "24": { "Pressure": 0.05 }
+      "23": { "Mode": 1, "On": 0, "PressureExternal": 0 },
+      "24": { "Pressure": 0.1 }
     }
   }
 }

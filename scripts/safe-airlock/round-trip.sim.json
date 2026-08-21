@@ -41,10 +41,10 @@
     }
   ],
   "changes": [
-    { "afterStep": 60, "devices": { "24": { "Pressure": 0.05 } } },
+    { "afterStep": 60, "devices": { "24": { "Pressure": 0.1 } } },
     { "afterStep": 130, "devices": { "24": { "Pressure": 100 } } },
     { "afterStep": 200, "devices": { "21": { "Setting": 1 } } },
-    { "afterStep": 300, "devices": { "24": { "Pressure": 0.05 } } },
+    { "afterStep": 300, "devices": { "24": { "Pressure": 0.1 } } },
     { "afterStep": 400, "devices": { "20": { "Setting": 1 } } },
     { "afterStep": 520, "devices": { "24": { "Pressure": 100 } } }
   ],
@@ -53,8 +53,8 @@
       "10": { "Setting": 0 },
       "20": { "Setting": 1, "Open": 1, "Lock": 0 },
       "21": { "Setting": 0, "Open": 0, "Lock": 0 },
-      "22": { "Mode": 1, "On": 0, "PressureExternal": 0.1 },
-      "23": { "Mode": 1, "On": 0, "PressureExternal": 0.1 },
+      "22": { "Mode": 1, "On": 0, "PressureExternal": 0 },
+      "23": { "Mode": 1, "On": 0, "PressureExternal": 0 },
       "25": { "On": 0 }
     }
   }

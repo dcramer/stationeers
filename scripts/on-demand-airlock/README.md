@@ -32,6 +32,10 @@ Configure these constants near the top of `on-demand-airlock.ic10`:
 | `OPEN_LIMIT` | `10` loops | How long a requested door remains open |
 | `WAIT_LIMIT` | `600` loops | Door-closing and pressure timeout |
 
+A side target at or below `VACUUM_PRESSURE` skips filling. For a higher target,
+keep `PRESSURE_TOLERANCE` smaller than the difference between the target and
+`VACUUM_PRESSURE`.
+
 Use doors that expose `Mode`, `Setting`, `Open`, and `Lock`. Logic mode makes
 their handles change `Setting` instead of moving the doors directly. Active
 Vents and Powered Vents expose the properties used here, but independently
@@ -56,6 +60,11 @@ vent network on the next cycle. On a cold start the chamber contents are
 unknown, so the first cycle purges through the exterior vent. Vents are only
 enabled after both doors report closed. The program turns a running vent off
 before starting the other vent or opening a door.
+
+Evacuation commands the active vent toward `0` kPa but completes at
+`VACUUM_PRESSURE`, avoiding an exact boundary between the vent's external safety
+cutoff and the Gas Sensor comparison. The open-door timer begins only after the
+requested door reports open.
 
 If a door cannot close or the requested pressure cannot be reached before
 `WAIT_LIMIT`, the controller turns both vents off, closes and locks both doors,
@@ -82,8 +91,8 @@ or configuration and restart the program.
   readings. A target at or below `VACUUM_PRESSURE` skips that side's fill phase.
 - `OPEN_LIMIT` and `WAIT_LIMIT` count completed yield loops, not wall-clock
   seconds. Tune the open interval in game.
-- Door opening is commanded but not timed as a fault because failure to open is
-  not hazardous; the short open interval ends by commanding both doors closed.
+- Door opening is not timed as a fault. A door that never reports open leaves
+  the controller waiting safely with both vents off.
 - The controller has no occupancy sensor. A slow user can press the handle again
   if the door closes before they pass through.
 - An unlocked Logic-mode door accepts handle requests but remains vulnerable to

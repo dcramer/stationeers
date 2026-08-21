@@ -44,7 +44,7 @@
     "devices": {
       "20": { "Open": 0, "Lock": 1 },
       "21": { "Open": 0, "Lock": 1 },
-      "23": { "Mode": 1, "On": 1, "PressureExternal": 0.1 },
+      "23": { "Mode": 1, "On": 1, "PressureExternal": 0 },
       "25": { "On": 1 }
     }
   }

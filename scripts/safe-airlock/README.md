@@ -37,12 +37,13 @@ Configure these constants near the top of `safe-airlock.ic10`:
 | `PRESSURE_TOLERANCE` | `1` kPa | How far below a fill target opening is allowed |
 | `WAIT_LIMIT` | `600` loops | Maximum wait at a door or pressure postcondition |
 
-Both destination pressures default to zero, so the controller evacuates the
-chamber and skips filling in either direction. A zero target can cause a strong
-pressure differential when its door opens. For a pressurized adjoining room,
-set that side's constant to its target pressure before operating the airlock
-without a suit. These are fixed targets; the program does not measure either
-adjoining room.
+Both destination pressures default to the `0.1` kPa evacuation threshold, so
+the controller skips filling in either direction. This can cause a strong
+pressure differential when a door opens. For a pressurized adjoining room, set
+that side's constant to its target pressure before operating the airlock without
+a suit. Keep `PRESSURE_TOLERANCE` smaller than the difference between that target
+and `VACUUM_PRESSURE`. These are fixed targets; the program does not measure
+either adjoining room.
 
 Use doors that expose `Mode`, `Setting`, `Open`, and `Lock`. Their handles are
 the cycle controls: Logic mode makes a handle write `Setting` instead of moving
@@ -58,7 +59,6 @@ The IC Housing `Setting` reports controller state:
 | `1` | Open to exterior |
 | `2` | Sealing or changing atmosphere |
 | `-1` | Runtime timeout; restart after correcting the cause |
-| `-2` | One or more required housing pins are unset |
 
 ## Behavior
 
@@ -67,7 +67,7 @@ to Logic mode, locks and closes them, and waits until they report closed. It
 treats the chamber atmosphere as untrusted: the exterior vent evacuates it to
 `VACUUM_PRESSURE`, optionally fills from the interior vent when
 `INNER_PRESSURE` is above that threshold, and only then opens the interior
-door. With the default zero target it opens without filling. This deterministic
+door. With the default `0.1` kPa target it opens without filling. This deterministic
 recovery can discard clean gas after a restart but does not send unknown chamber
 gas into the protected interior pipe.
 
@@ -78,6 +78,11 @@ closure, evacuates through the vent for the current side, optionally fills from
 the destination side, turns both vents off, and opens the destination door.
 The light turns off only after that door reports open. A Flashing Light flashes
 using its built-in behavior while powered. Every wait loop yields.
+
+Evacuation commands the active vent toward `0` kPa but completes once the Gas
+Sensor reads at or below `VACUUM_PRESSURE`. The lower vent target prevents the
+vent's external safety cutoff from stopping at the same boundary the controller
+is waiting to cross.
 
 If a door does not reach its commanded state or pressure does not reach its
 postcondition before `WAIT_LIMIT`, the controller turns both vents off, closes

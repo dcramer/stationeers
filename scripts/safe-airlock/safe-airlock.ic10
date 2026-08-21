@@ -9,13 +9,11 @@ alias innerVent d2
 alias outerVent d3
 alias sensor d4
 alias light d5
-bdns innerDoor configFault
-bdns outerDoor configFault
-bdns innerVent configFault
-bdns outerVent configFault
-bdns sensor configFault
+brdns innerVent 2
 s innerVent On 0
+brdns outerVent 2
 s outerVent On 0
+bdns sensor fault
 s innerDoor Mode 1
 s outerDoor Mode 1
 move r4 3
@@ -25,17 +23,13 @@ move r7 1
 move r2 INNER_PRESSURE
 move r3 0
 j cycle
-configFault:
-s db Setting -2
-yield
-j configFault
 cycle:
 s db Setting 2
 brdns light 2
 s light On 1
 jal seal
 s dr4 Mode 1
-s dr4 PressureExternal VACUUM_PRESSURE
+s dr4 PressureExternal 0
 s dr4 On 1
 jal waitVacuum
 s dr4 On 0
