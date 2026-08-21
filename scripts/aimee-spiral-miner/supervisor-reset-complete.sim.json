@@ -13,7 +13,7 @@
       "prefab": "Robot",
       "pin": "d5",
       "virtual": true,
-      "props": { "PositionX": 302, "PositionZ": -221, "Mode": 2 },
+      "props": { "PositionX": 301, "PositionZ": -221, "Mode": 2 },
       "slots": [{ "index": 0, "item": "ItemBatteryCellLarge" }]
     },
     { "id": 26, "prefab": "StructureLogicSwitch", "name": "AIMeE Recall", "props": { "Open": 0 } },

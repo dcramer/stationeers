@@ -118,10 +118,11 @@ The supplied exclusion bounds already include the intended AIMeE roaming
 margin. In particular, the southern safety boundary is Z -430. The coordinator
 uses the bounds directly and does not add another automatic margin.
 
-The mining center `(442, -221)` lies 140 meters due east of the unload point
-`(302, -221)`. The waypoint `(322, -221)` is 20 meters east of unload, so the
-final approach travels due west. With `MAX_RANGE` 120, generated targets extend
-from X 322 through X 562 and never cross the waypoint line toward the base.
+The mining center `(442, -221)` lies 141 meters due east of the unload point
+`(301, -221)`. The waypoint remains on the west side of the physical hangar at
+`(260, -221)`, 41 meters west of unload, so the final approach travels due east.
+It is not mirrored with the mining field. With `MAX_RANGE` 120, generated
+targets extend from X 322 through X 562 on the east side of the base.
 AIMeE can roam about 15 meters from a target. The exclusion rectangle removes
 generated targets that overlap the mapped base boundary; it does not constrain
 travel between targets. The farthest target is about 260 meters from the chute.
@@ -135,8 +136,8 @@ is not to scale:
                               north (+Z)
                                   ^
                                   |
- west (-X) <---- unload ----------+---------- waypoint ---- mining center ----> east (+X)
-                (302,-221)                  (322,-221)       (442,-221)
+ west (-X) <---- waypoint ---- unload -------+-------------- mining center ----> east (+X)
+                (260,-221)   (301,-221)                       (442,-221)
                                   |
                                   v
                               south (-Z)
@@ -153,21 +154,21 @@ Keep this history when tuning coordinates so each push has a known reference:
 |---|---|---|---|---|
 | Original north | `(303, -120)` | `(303, -190)` | `(303, -228)` | Southbound |
 | West push | `(162, -221)` | `(282, -221)` | `(302, -221)` | Eastbound |
-| East push (active) | `(442, -221)` | `(322, -221)` | `(302, -221)` | Westbound |
+| East field (active) | `(442, -221)` | `(260, -221)` | `(301, -221)` | Eastbound |
 
 Miner defaults:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `WAYPOINT_X` | 322 | Clear hangar-entry point X |
+| `WAYPOINT_X` | 260 | Clear hangar-entry point X |
 | `WAYPOINT_Z` | -221 | Clear hangar-entry point Z |
-| `UNLOAD_X` | 302 | Intake chute/charger X |
+| `UNLOAD_X` | 301 | Intake chute/charger X |
 | `UNLOAD_Z` | -221 | Intake chute/charger Z |
 | `LOW_BATT` | 0.5 | Charge ratio that triggers return |
 | `READY_BATT` | 0.7 | Charge ratio required before release |
 
-The waypoint `(322, -221)` is aligned with the intake chute at `(302, -221)`.
-Confirm that it is outside the hangar and that the straight 20-meter westbound
+The waypoint `(260, -221)` is aligned with the intake chute at `(301, -221)`.
+Confirm that it is outside the hangar and that the straight 41-meter eastbound
 X approach is unobstructed before running unattended. Navigation uses an X/Z
 target and waits for AIMeE to leave Mode 2 naturally before starting the next
 operation. More than 20 consecutive updates below velocity 0.2 trigger Mode 5
