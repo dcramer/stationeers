@@ -60,7 +60,8 @@ does not add heating, cooling, tanks, filtration, or pressure regulators.
 | `MIN_CO2_RATIO` | `0.05` | Starts a Mars-air refresh below 5% CO2 |
 | `CO2_FILL_PRESSURE` | `90` kPa | Maximum pressure during CO2 refresh |
 | `CO2_PURGE_PRESSURE` | `75` kPa | Purge target when CO2 is low at 90 kPa |
-| `COOL_START_TEMP` | `305.15` K | Starts a Mars-air cooling exchange above 32 °C |
+| `COOL_START_TEMP` | `305.15` K | Starts a Mars-air cooling exchange at 32 °C |
+| `COOL_STOP_TEMP` | `303.15` K | Stops cooling after the room reaches 30 °C |
 | `MIN_CO2_REFRESH_TEMP` | `288.15` K | Suppresses optional CO2 refresh below 15 °C |
 
 The Grow Light is on whenever direct sunlight activates the Daylight Sensor and
@@ -81,11 +82,15 @@ to 90 kPa. If the room is already at 90 kPa, it first dumps gas to 75 kPa and
 then refills with CO2-rich Mars air. This is a simple, lossy refresh suitable
 for a few starter plants.
 
-Sunlight, the Grow Light, and plants add heat. Above 32 °C the controller uses
-the same dump-and-refill operation to exchange hot greenhouse gas for cooler
-Mars atmosphere. Below 15 °C it postpones optional CO2 refreshing so it does
-not deliberately add more cold gas. A refill below 65 kPa still takes priority
-because adequate pressure is required for plant survival.
+Sunlight, the Grow Light, and plants add heat. At 32 °C the controller uses the
+same dump-and-refill operation to exchange hot greenhouse gas for cooler Mars
+atmosphere. Cooling remains active until 30 °C, preventing rapid cycling at the
+start threshold. Each exchange holds inward mode until the purge reaches 75
+kPa, then holds outward mode until the refill reaches 90 kPa. The vent is only
+powered down before an actual direction change. Below 15 °C the controller
+postpones optional CO2 refreshing so it does not deliberately add more cold
+gas. A refill below 65 kPa still takes priority because adequate pressure is
+required for plant survival.
 
 The IC Housing's `Setting` shows the last room pressure. A missing required
 device, invalid sensor reading, or combustion turns the light and vent off,
@@ -113,5 +118,7 @@ shows `-1`, and retries after one tick.
 | `r0` | Greenhouse pressure |
 | `r1` | Greenhouse carbon-dioxide ratio |
 | `r2` | Greenhouse temperature |
-| `r3` | Temporary status or daylight value |
+| `r3` | Temporary status, daylight value, or vent pressure target |
+| `r4` | Cooling-active flag |
+| `r5` | Refresh phase: `0` idle, `1` purge, `2` refill |
 | `ra` | Return address for `safeOff` |

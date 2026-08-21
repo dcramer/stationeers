@@ -6,6 +6,7 @@ define MIN_CO2_RATIO 0.05
 define CO2_FILL_PRESSURE 90
 define CO2_PURGE_PRESSURE 75
 define COOL_START_TEMP 305.15
+define COOL_STOP_TEMP 303.15
 define MIN_CO2_REFRESH_TEMP 288.15
 define MAX_PIPE_PRESSURE 5000
 alias sensor d0
@@ -16,8 +17,12 @@ alias pressure r0
 alias co2Ratio r1
 alias temperature r2
 alias work r3
+alias cooling r4
+alias refreshPhase r5
 start:
 move sp 0
+move cooling 0
+move refreshPhase 0
 jal safeOff
 bdns sensor fault
 bdns growLight fault
@@ -40,46 +45,72 @@ bgt pressure HIGH_PRESSURE ventHigh
 blt pressure FILL_START_PRESSURE fillLow
 l temperature sensor Temperature
 bnan temperature fault
-bgt temperature COOL_START_TEMP refreshAir
+bge temperature COOL_START_TEMP coolingOn
+ble temperature COOL_STOP_TEMP coolingOff
+coolingReady:
+beq refreshPhase 1 refreshPurge
+beq refreshPhase 2 refreshFill
+bnez cooling refreshAir
 l co2Ratio sensor RatioCarbonDioxide
 bnan co2Ratio fault
 blt temperature MIN_CO2_REFRESH_TEMP ventOff
 blt co2Ratio MIN_CO2_RATIO refreshAir
 j ventOff
+coolingOn:
+move cooling 1
+j coolingReady
+coolingOff:
+move cooling 0
+j coolingReady
 fillLow:
-s vent On 0
-s vent Mode 0
-s vent PressureExternal FILL_TARGET_PRESSURE
-s vent PressureInternal 0
-s vent On 1
-j wait
+move work FILL_TARGET_PRESSURE
+j pumpOut
 ventHigh:
-s vent On 0
-s vent Mode 1
-s vent PressureExternal VENT_TARGET_PRESSURE
-s vent PressureInternal MAX_PIPE_PRESSURE
-s vent On 1
-j wait
+move work VENT_TARGET_PRESSURE
+j pumpIn
 refreshAir:
-bge pressure CO2_FILL_PRESSURE purgeCO2
-s vent On 0
-s vent Mode 0
-s vent PressureExternal CO2_FILL_PRESSURE
-s vent PressureInternal 0
-s vent On 1
-j wait
-purgeCO2:
-s vent On 0
-s vent Mode 1
-s vent PressureExternal CO2_PURGE_PRESSURE
-s vent PressureInternal MAX_PIPE_PRESSURE
-s vent On 1
-j wait
+bge pressure CO2_FILL_PRESSURE startPurge
+move refreshPhase 2
+j refreshFill
+startPurge:
+move refreshPhase 1
+refreshPurge:
+ble pressure CO2_PURGE_PRESSURE purgeDone
+move work CO2_PURGE_PRESSURE
+j pumpIn
+purgeDone:
+move refreshPhase 2
+refreshFill:
+bge pressure CO2_FILL_PRESSURE refreshDone
+move work CO2_FILL_PRESSURE
+j pumpOut
+refreshDone:
+move refreshPhase 0
 ventOff:
 s vent On 0
 wait:
 yield
 j main
+pumpIn:
+l temperature vent Mode
+bnez temperature pumpInReady
+s vent On 0
+s vent Mode 1
+pumpInReady:
+s vent PressureExternal work
+s vent PressureInternal MAX_PIPE_PRESSURE
+s vent On 1
+j wait
+pumpOut:
+l temperature vent Mode
+beqz temperature pumpOutReady
+s vent On 0
+s vent Mode 0
+pumpOutReady:
+s vent PressureExternal work
+s vent PressureInternal 0
+s vent On 1
+j wait
 fault:
 jal safeOff
 s db Setting -1
