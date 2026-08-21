@@ -1,0 +1,128 @@
+define INNER_PRESSURE 0.1
+define OUTER_PRESSURE 0.1
+define VACUUM_PRESSURE 0.1
+define PRESSURE_TOLERANCE 1
+define OPEN_LIMIT 10
+define WAIT_LIMIT 600
+alias innerDoor d0
+alias outerDoor d1
+alias innerVent d2
+alias outerVent d3
+alias sensor d4
+alias waitCount r0
+alias value r1
+alias request r2
+alias lastSide r3
+alias door r4
+alias otherDoor r5
+alias sourceVent r6
+alias threshold r7
+bdns innerDoor configFault
+bdns outerDoor configFault
+bdns innerVent configFault
+bdns outerVent configFault
+bdns sensor configFault
+s innerVent On 0
+s outerVent On 0
+s innerDoor Mode 1
+s outerDoor Mode 1
+move lastSide -1
+closeIdle:
+jal seal
+s innerDoor Lock 0
+s outerDoor Lock 0
+idle:
+yield
+l value innerDoor Setting
+bnez value requestInner
+l value outerDoor Setting
+bnez value requestOuter
+j idle
+requestInner:
+move request 0
+j cycle
+requestOuter:
+move request 1
+cycle:
+jal seal
+select sourceVent lastSide 3 2
+s dr6 Mode 1
+s dr6 PressureExternal VACUUM_PRESSURE
+s dr6 On 1
+move threshold VACUUM_PRESSURE
+move r8 0
+jal waitPressure
+s dr6 On 0
+select threshold request OUTER_PRESSURE INNER_PRESSURE
+ble threshold VACUUM_PRESSURE openRequested
+add sourceVent request 2
+s dr6 Mode 0
+s dr6 PressureExternal threshold
+s dr6 On 1
+sub threshold threshold PRESSURE_TOLERANCE
+move r8 1
+jal waitPressure
+s dr6 On 0
+openRequested:
+move door request
+xor otherDoor request 1
+s dr4 Setting 1
+s dr4 Open 1
+s innerDoor Lock 0
+s outerDoor Lock 0
+move lastSide request
+move waitCount 0
+holdOpen:
+yield
+l value dr4 Setting
+beqz value closeIdle
+l value dr5 Setting
+bnez value oppositeRequest
+add waitCount waitCount 1
+bge waitCount OPEN_LIMIT closeIdle
+j holdOpen
+oppositeRequest:
+move request otherDoor
+j cycle
+seal:
+s innerDoor Lock 1
+s outerDoor Lock 1
+s innerDoor Setting 0
+s outerDoor Setting 0
+s innerDoor Open 0
+s outerDoor Open 0
+move waitCount 0
+sealWait:
+yield
+l value innerDoor Open
+l r9 outerDoor Open
+or value value r9
+beqz value ra
+add waitCount waitCount 1
+bge waitCount WAIT_LIMIT fault
+j sealWait
+waitPressure:
+move waitCount 0
+pressureWait:
+yield
+l value sensor Pressure
+sle r9 value threshold
+sge value value threshold
+select value r8 value r9
+bnez value ra
+add waitCount waitCount 1
+bge waitCount WAIT_LIMIT fault
+j pressureWait
+fault:
+s innerVent On 0
+s outerVent On 0
+s innerDoor Open 0
+s outerDoor Open 0
+s innerDoor Lock 1
+s outerDoor Lock 1
+faultWait:
+yield
+j faultWait
+configFault:
+yield
+j configFault

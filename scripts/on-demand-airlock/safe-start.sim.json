@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "script": "on-demand-airlock.ic10",
+  "steps": 80,
+  "devices": [
+    { "id": 20, "prefab": "StructureCompositeDoor", "pin": "d0", "props": { "Mode": 0, "Setting": 1, "Open": 1, "Lock": 0 } },
+    { "id": 21, "prefab": "StructureCompositeDoor", "pin": "d1", "props": { "Mode": 0, "Setting": 0, "Open": 0, "Lock": 0 } },
+    { "id": 22, "prefab": "StructureActiveVent", "pin": "d2", "props": { "Mode": 1, "On": 1, "PressureExternal": 0 } },
+    { "id": 23, "prefab": "StructureActiveVent", "pin": "d3", "props": { "Mode": 0, "On": 1, "PressureExternal": 100 } },
+    { "id": 24, "prefab": "StructureGasSensor", "pin": "d4", "props": { "Pressure": 50 } }
+  ],
+  "expect": {
+    "devices": {
+      "20": { "Mode": 1, "Setting": 0, "Open": 0, "Lock": 0 },
+      "21": { "Mode": 1, "Setting": 0, "Open": 0, "Lock": 0 },
+      "22": { "On": 0 },
+      "23": { "On": 0 }
+    }
+  }
+}

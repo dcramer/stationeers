@@ -31,8 +31,8 @@ Configure these constants near the top of `safe-airlock.ic10`:
 
 | Constant | Default | Meaning |
 |---|---:|---|
-| `INNER_PRESSURE` | `0` kPa | Pressure required before opening inward |
-| `OUTER_PRESSURE` | `0` kPa | Pressure required before opening outward |
+| `INNER_PRESSURE` | `0.1` kPa | Pressure required before opening inward |
+| `OUTER_PRESSURE` | `0.1` kPa | Pressure required before opening outward |
 | `VACUUM_PRESSURE` | `0.1` kPa | Evacuation completion threshold |
 | `PRESSURE_TOLERANCE` | `1` kPa | How far below a fill target opening is allowed |
 | `WAIT_LIMIT` | `600` loops | Maximum wait at a door or pressure postcondition |
